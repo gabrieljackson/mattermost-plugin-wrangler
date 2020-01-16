@@ -37,6 +37,12 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	if len(postList) == 0 {
 		return nil, false, fmt.Errorf("Sorting the post list response for post %s resulted in no posts", postID)
 	}
+
+	config := p.getConfiguration()
+	if config.MaxThreadCountMoveSizeInt() != 0 && config.MaxThreadCountMoveSizeInt() < len(postList) {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: the thread is %d posts long, but the move thead command is configured to only move threads of up to %d posts", len(postList), config.MaxThreadCountMoveSizeInt())), true, nil
+	}
+
 	if postList[0].ChannelId != extra.ChannelId {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the move command must be run from the channel containing the post"), true, nil
 	}

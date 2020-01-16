@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"reflect"
+	"strconv"
 
 	"github.com/pkg/errors"
 )
@@ -19,7 +21,10 @@ import (
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
 type configuration struct {
-	AllowedEmailDomain string
+	AllowedEmailDomain     string
+	MaxThreadCountMoveSize string
+
+	maxThreadCountMoveSizeInt int
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if
@@ -35,7 +40,26 @@ func (c *configuration) IsValid() error {
 		return errors.Wrap(err, "invalid AllowedEmailDomain")
 	}
 
+	// If MaxThreadCountMoveSize is not configured, set it to 0 which stands for
+	// unlimited thread message count.
+	if len(c.MaxThreadCountMoveSize) == 0 {
+		c.maxThreadCountMoveSizeInt = 0
+	} else {
+		max, err := strconv.Atoi(c.MaxThreadCountMoveSize)
+		if err != nil {
+			return errors.Wrapf(err, "MaxThreadCountMoveSize value %s is not a valid integer", c.MaxThreadCountMoveSize)
+		}
+		if max < 1 {
+			return fmt.Errorf("MaxThreadCountMoveSize (%d) must be greater than 0", max)
+		}
+		c.maxThreadCountMoveSizeInt = max
+	}
+
 	return nil
+}
+
+func (c *configuration) MaxThreadCountMoveSizeInt() int {
+	return c.maxThreadCountMoveSizeInt
 }
 
 // getConfiguration retrieves the active configuration under lock, making it safe to use

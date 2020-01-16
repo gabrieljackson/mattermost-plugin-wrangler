@@ -20,6 +20,12 @@
                 "display_name": "Allowed Email Domain",
                 "type": "text",
                 "help_text": "(Optional) When set, users must have an email ending in this domain to use the message wrangler slash command."
+            },
+            {
+                "key": "MaxThreadCountMoveSize",
+                "display_name": "Max Thread Count Move Size",
+                "type": "text",
+                "help_text": "The maximum number of messages in a thread that is allowed to be moved by the plugin. Leave empty for unlimited messages."
             }
         ]
     }
