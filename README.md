@@ -1,6 +1,10 @@
-# Mattermost Message Wrangler Plugin
+<img src="https://github.com/gabrieljackson/mattermost-plugin-messagewrangler/blob/master/assets/profile.png?raw=true" width="75" height="75" alt="wrangler">
 
-Move your [Mattermost](https://mattermost.com) messages around!
+# Message Wrangler
+
+A [Mattermost](https://mattermost.com) plugin for managing messages.
+
+[![CircleCI](https://circleci.com/gh/gabrieljackson/mattermost-plugin-messagewrangler.svg?style=shield)](https://circleci.com/gh/gabrieljackson/mattermost-plugin-messagewrangler)
 
 ## Install
 
