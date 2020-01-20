@@ -10,10 +10,10 @@ import (
 
 const moveThreadMessage = `Error: missing arguments
 
-Usage: |/mw move thread [POST_ID] [CHANNEL_ID]|
+Usage: |/wrangler move thread [POST_ID] [CHANNEL_ID]|
 
  - Obtain the post ID via the |Permalink| post dropdown option. It's the last part of the URL.
- - Obtain the channel ID via the Channel |View Info| option or by running |/mw list|.
+ - Obtain the channel ID via the Channel |View Info| option or by running |/wrangler list|.
 `
 
 func getMoveThreadMessage() string {

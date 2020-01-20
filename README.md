@@ -1,10 +1,10 @@
-<img src="https://github.com/gabrieljackson/mattermost-plugin-messagewrangler/blob/master/assets/profile.png?raw=true" width="75" height="75" alt="wrangler">
+<img src="https://github.com/gabrieljackson/mattermost-plugin-wrangler/blob/master/assets/profile.png?raw=true" width="75" height="75" alt="wrangler">
 
-# Message Wrangler
+# Mattermost Wrangler Plugin
 
 A [Mattermost](https://mattermost.com) plugin for managing messages.
 
-[![CircleCI](https://circleci.com/gh/gabrieljackson/mattermost-plugin-messagewrangler.svg?style=shield)](https://circleci.com/gh/gabrieljackson/mattermost-plugin-messagewrangler)
+[![CircleCI](https://circleci.com/gh/gabrieljackson/mattermost-plugin-wrangler.svg?style=shield)](https://circleci.com/gh/gabrieljackson/mattermost-plugin-wrangler)
 
 ## Install
 
@@ -15,4 +15,4 @@ A [Mattermost](https://mattermost.com) plugin for managing messages.
 
 ## Usage
 
-Type `/mw` for a list of all Message Wrangler commands.
+Type `/wrangler` for a list of all Wrangler commands.

@@ -8,12 +8,12 @@ import (
 	"github.com/mattermost/mattermost-server/plugin"
 )
 
-const helpText = `**Message Wrangler Plugin - Slash Command Help**
+const helpText = `**Wrangler Plugin - Slash Command Help**
 
-* |/mw move thread [POST_ID] [CHANNEL_ID]| - Move a given post, along with the thread it belongs to, to a given channel
+* |/wrangler move thread [POST_ID] [CHANNEL_ID]| - Move a given post, along with the thread it belongs to, to a given channel
   * This can be on any channel in any team that you have joined
-* |/mw list| - List the IDs of all channels you have joined
-* |/mw info| - Shows plugin information`
+* |/wrangler list| - List the IDs of all channels you have joined
+* |/wrangler info| - Shows plugin information`
 
 func getHelp() string {
 	return strings.Replace(helpText, "|", "`", -1)
@@ -21,9 +21,9 @@ func getHelp() string {
 
 func getCommand() *model.Command {
 	return &model.Command{
-		Trigger:          "mw",
-		DisplayName:      "Message Wrangler",
-		Description:      "Move some messages!",
+		Trigger:          "wrangler",
+		DisplayName:      "Wrangler",
+		Description:      "Manage Mattermost messages!",
 		AutoComplete:     false,
 		AutoCompleteDesc: "Available commands: move, list, info",
 		AutoCompleteHint: "[command]",
@@ -34,7 +34,7 @@ func getCommandResponse(responseType, text string) *model.CommandResponse {
 	return &model.CommandResponse{
 		ResponseType: responseType,
 		Text:         text,
-		Username:     "message.wrangler",
+		Username:     "wrangler",
 		IconURL:      fmt.Sprintf("/plugins/%s/profile.png", manifest.ID),
 	}
 }
@@ -92,7 +92,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	if err != nil {
 		p.API.LogError(err.Error())
 		if userError {
-			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("__Error: %s__\n\nRun `/mw help` for usage instructions.", err.Error())), nil
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("__Error: %s__\n\nRun `/wrangler help` for usage instructions.", err.Error())), nil
 		}
 
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "An unknown error occurred. Please talk to your administrator for help."), nil
@@ -102,8 +102,8 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 }
 
 func (p *Plugin) runInfoCommand(args []string, extra *model.CommandArgs) (*model.CommandResponse, bool, error) {
-	resp := fmt.Sprintf("Message Wrangler plugin version: %s, "+
-		"[%s](https://github.com/gabrieljackson/mattermost-plugin-messagewrangler/commit/%s), built %s\n\n",
+	resp := fmt.Sprintf("Wrangler plugin version: %s, "+
+		"[%s](https://github.com/gabrieljackson/mattermost-plugin-wrangler/commit/%s), built %s\n\n",
 		manifest.Version, BuildHashShort, BuildHash, BuildDate)
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, resp), false, nil

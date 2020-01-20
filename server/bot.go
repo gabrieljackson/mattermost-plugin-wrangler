@@ -6,7 +6,7 @@ import (
 	"github.com/mattermost/mattermost-server/model"
 )
 
-// PostBotDM posts a DM as the Message Wrangler bot user.
+// PostBotDM posts a DM as the Wrangler bot user.
 func (p *Plugin) PostBotDM(userID, message string) error {
 	channel, appError := p.API.GetDirectChannel(userID, p.BotUserID)
 	if appError != nil {

@@ -1,6 +1,6 @@
 {
-    "id": "com.mattermost.messagewrangler",
-    "name": "Message Wrangler",
+    "id": "com.mattermost.wrangler",
+    "name": "Wrangler",
     "description": "Manage messages accross teams and channels",
     "version": "0.1.0",
     "min_server_version": "5.12.0",
@@ -19,7 +19,7 @@
                 "key": "AllowedEmailDomain",
                 "display_name": "Allowed Email Domain",
                 "type": "text",
-                "help_text": "(Optional) When set, users must have an email ending in this domain to use the message wrangler slash command."
+                "help_text": "(Optional) When set, users must have an email ending in this domain to use the wrangler slash command."
             },
             {
                 "key": "MaxThreadCountMoveSize",
