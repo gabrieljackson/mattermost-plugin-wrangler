@@ -60,9 +60,14 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	// 3. The command was run from the original channel with the post, so they
 	//    are also a member of that channel.
 
-	channel, appErr := p.API.GetChannel(channelID)
+	targetChannel, appErr := p.API.GetChannel(channelID)
 	if appErr != nil {
 		return nil, false, fmt.Errorf("unable to get channel with ID %s", channelID)
+	}
+
+	targetTeam, appErr := p.API.GetTeam(targetChannel.TeamId)
+	if appErr != nil {
+		return nil, false, fmt.Errorf("unable to get team with ID %s", targetChannel.TeamId)
 	}
 
 	var finalList []*model.Post
@@ -114,7 +119,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		}
 	}
 
-	msg := fmt.Sprintf("A thread with %d posts has been moved to %s", len(finalList), channel.Name)
+	msg := fmt.Sprintf("A thread with %d posts has been moved to %s:%s", len(finalList), targetTeam.Name, targetChannel.Name)
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_IN_CHANNEL, msg), false, nil
 }
