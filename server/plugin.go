@@ -44,12 +44,12 @@ func (p *Plugin) OnActivate() error {
 	}
 
 	botID, err := p.Helpers.EnsureBot(&model.Bot{
-		Username:    "message.wrangler",
-		DisplayName: "Message Wrangler",
-		Description: "Created by the Message Wrangler plugin.",
+		Username:    "wrangler",
+		DisplayName: "Wrangler",
+		Description: "Created by the Wrangler plugin.",
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to ensure Message Wrangler bot")
+		return errors.Wrap(err, "failed to ensure Wrangler bot")
 	}
 	p.BotUserID = botID
 
