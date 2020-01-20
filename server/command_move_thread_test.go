@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/mattermost/mattermost-server/model"
@@ -16,10 +17,20 @@ func TestMoveThreadCommand(t *testing.T) {
 		Name: "original-channel",
 	}
 
+	targetTeam := &model.Team{
+		Id:   model.NewId(),
+		Name: "target-team",
+	}
+	targetChannel := &model.Channel{
+		Id:   model.NewId(),
+		Name: "target-channel",
+	}
+
 	api := &plugintest.API{}
 	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGeneratePostList(3, originalChannel.Id), nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
-	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(originalChannel, nil)
+	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
+	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
 
@@ -44,7 +55,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
-		assert.Contains(t, resp.Text, "A thread with 3 posts has been moved to")
+		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with %d posts has been moved to %s:%s", 3, targetTeam.Name, targetChannel.Name))
 	})
 
 	t.Run("not in thread channel", func(t *testing.T) {
