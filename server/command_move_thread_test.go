@@ -41,14 +41,14 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.True(t, isUserError)
-		assert.Contains(t, resp.Text, "Error: missing arguements")
+		assert.Contains(t, resp.Text, "Error: missing arguments")
 	})
 
 	t.Run("one arg", func(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.True(t, isUserError)
-		assert.Contains(t, resp.Text, "Error: missing arguements")
+		assert.Contains(t, resp.Text, "Error: missing arguments")
 	})
 
 	t.Run("move thread successfully", func(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const moveThreadMessage = `Error: missing arguements
+const moveThreadMessage = `Error: missing arguments
 
 Usage: |/mw move thread [POST_ID] [CHANNEL_ID]|
 
