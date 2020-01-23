@@ -23,8 +23,6 @@ import (
 type configuration struct {
 	AllowedEmailDomain     string
 	MaxThreadCountMoveSize string
-
-	maxThreadCountMoveSizeInt int
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if
@@ -40,26 +38,39 @@ func (c *configuration) IsValid() error {
 		return errors.Wrap(err, "invalid AllowedEmailDomain")
 	}
 
-	// If MaxThreadCountMoveSize is not configured, set it to 0 which stands for
-	// unlimited thread message count.
-	if len(c.MaxThreadCountMoveSize) == 0 {
-		c.maxThreadCountMoveSizeInt = 0
-	} else {
-		max, err := strconv.Atoi(c.MaxThreadCountMoveSize)
-		if err != nil {
-			return errors.Wrapf(err, "MaxThreadCountMoveSize value %s is not a valid integer", c.MaxThreadCountMoveSize)
-		}
-		if max < 1 {
-			return fmt.Errorf("MaxThreadCountMoveSize (%d) must be greater than 0", max)
-		}
-		c.maxThreadCountMoveSizeInt = max
+	_, err = parseAndValidateMaxThreadCountMoveSize(c.MaxThreadCountMoveSize)
+	if err != nil {
+		return errors.Wrap(err, "invalid MaxThreadCountMoveSize")
 	}
 
 	return nil
 }
 
 func (c *configuration) MaxThreadCountMoveSizeInt() int {
-	return c.maxThreadCountMoveSizeInt
+	// Use the parseAndValidate function, but ignore the error.
+	i, _ := parseAndValidateMaxThreadCountMoveSize(c.MaxThreadCountMoveSize)
+
+	return i
+}
+
+// parseAndValidateMaxThreadCountMoveSize parses the max thread size config
+// value and returns an error if the value is invalid or cannot be parsed.
+// If MaxThreadCountMoveSize is not configured, set it to 0 which stands for
+// unlimited thread message count.
+func parseAndValidateMaxThreadCountMoveSize(s string) (int, error) {
+	if len(s) == 0 {
+		return 0, nil
+	}
+
+	max, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, errors.Wrapf(err, "MaxThreadCountMoveSize value %s is not a valid integer", s)
+	}
+	if max < 1 {
+		return 0, fmt.Errorf("MaxThreadCountMoveSize (%d) must be greater than 0", max)
+	}
+
+	return max, nil
 }
 
 // getConfiguration retrieves the active configuration under lock, making it safe to use
