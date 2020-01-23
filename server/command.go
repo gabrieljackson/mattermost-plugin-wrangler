@@ -10,8 +10,10 @@ import (
 
 const helpText = `**Wrangler Plugin - Slash Command Help**
 
-* |/wrangler move thread [POST_ID] [CHANNEL_ID]| - Move a given post, along with the thread it belongs to, to a given channel
+* |/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]| - Move a given message, along with the thread it belongs to, to a given channel
   * This can be on any channel in any team that you have joined
+  * Obtain the message ID via the |Permalink| message dropdown option. It's the last part of the URL.
+  * Obtain the channel ID via the Channel |View Info| option or by running |/wrangler list|
 * |/wrangler list| - List the IDs of all channels you have joined
 * |/wrangler info| - Shows plugin information`
 
