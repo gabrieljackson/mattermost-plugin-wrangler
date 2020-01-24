@@ -82,6 +82,7 @@ func mockGeneratePostList(total int, channelID string) *model.PostList {
 		postList.AddPost(&model.Post{
 			Id:        id,
 			ChannelId: channelID,
+			Message:   fmt.Sprintf("This is message %d", i),
 		})
 		postList.AddOrder(id)
 	}
