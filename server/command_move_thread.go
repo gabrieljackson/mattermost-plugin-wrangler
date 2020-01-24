@@ -119,7 +119,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		}
 	}
 
-	msg := fmt.Sprintf("A thread with %d posts has been moved to %s:%s", len(finalList), targetTeam.Name, targetChannel.Name)
+	msg := fmt.Sprintf("A thread with %d posts has been moved [ team=%s, channel=%s ]", len(finalList), targetTeam.Name, targetChannel.Name)
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_IN_CHANNEL, msg), false, nil
 }

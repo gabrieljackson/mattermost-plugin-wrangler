@@ -55,7 +55,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
-		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with %d posts has been moved to %s:%s", 3, targetTeam.Name, targetChannel.Name))
+		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with %d posts has been moved [ team=%s, channel=%s ]", 3, targetTeam.Name, targetChannel.Name))
 	})
 
 	t.Run("not in thread channel", func(t *testing.T) {
