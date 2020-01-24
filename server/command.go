@@ -12,9 +12,10 @@ const helpText = `**Wrangler Plugin - Slash Command Help**
 
 * |/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]| - Move a given message, along with the thread it belongs to, to a given channel
   * This can be on any channel in any team that you have joined
-  * Obtain the message ID via the |Permalink| message dropdown option. It's the last part of the URL.
-  * Obtain the channel ID via the Channel |View Info| option or by running |/wrangler list|
-* |/wrangler list| - List the IDs of all channels you have joined
+  * Obtain the message ID by running |/wrangler list messages| or via the |Permalink| message dropdown option (it's the last part of the URL)
+  * Obtain the channel ID by running |/wrangler list channels| or via the channel |View Info| option
+* |/wrangler list channels| - List the IDs of all channels you have joined
+* |/wrangler list messages| - List the IDs of the 20 most recent messages in this channel
 * |/wrangler info| - Shows plugin information`
 
 func getHelp() string {
@@ -78,8 +79,18 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 			stringArgs = stringArgs[3:]
 		}
 	case "list":
-		handler = p.runListChannelsCommand
-		stringArgs = stringArgs[2:]
+		if len(stringArgs) < 3 {
+			break
+		}
+
+		switch stringArgs[2] {
+		case "channels":
+			handler = p.runListChannelsCommand
+			stringArgs = stringArgs[3:]
+		case "messages":
+			handler = p.runListMessagesCommand
+			stringArgs = stringArgs[3:]
+		}
 	case "info":
 		handler = p.runInfoCommand
 		stringArgs = stringArgs[2:]
