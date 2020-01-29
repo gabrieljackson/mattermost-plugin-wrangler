@@ -17,7 +17,10 @@ In the future, the wrangler plugin will be developed to support additional tasks
 1. Go the releases page and download the latest release.
 2. On your Mattermost, go to System Console -> Plugin Management and upload it.
 3. Configure plugin settings as desired.
-4. Start using it!
+4. In order for the plugin to properly recreate messages, ensure the following system console settings are set to true:
+    1. [Enable integrations to override usernames](https://docs.mattermost.com/administration/config-settings.html#enable-integrations-to-override-usernames)
+    2. [Enable integrations to override profile picture icons](https://docs.mattermost.com/administration/config-settings.html#enable-integrations-to-override-profile-picture-icons)
+5. Start using the plugin!
 
 ## Usage
 
