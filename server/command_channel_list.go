@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mattermost/mattermost-server/model"
+	"github.com/mattermost/mattermost-server/v5/model"
 )
 
 func (p *Plugin) runListChannelsCommand(args []string, extra *model.CommandArgs) (*model.CommandResponse, bool, error) {
