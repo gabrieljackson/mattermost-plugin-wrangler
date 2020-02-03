@@ -9,8 +9,8 @@ import (
 
 const moveThreadMessage = `Error: missing arguments
 
-- /wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
-    Move a given message, along with the thread it belongs to, to a given channel
+/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
+  Move a given message, along with the thread it belongs to, to a given channel
     - This can be on any channel in any team that you have joined
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
