@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -10,14 +9,15 @@ import (
 
 const moveThreadMessage = `Error: missing arguments
 
-Usage: |/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]|
-
- * Obtain the message ID via the |Permalink| message dropdown option. It's the last part of the URL.
- * Obtain the channel ID via the Channel |View Info| option or by running |/wrangler list|.
+- /wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
+    Move a given message, along with the thread it belongs to, to a given channel
+    - This can be on any channel in any team that you have joined
+    - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
+    - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 `
 
 func getMoveThreadMessage() string {
-	return strings.Replace(moveThreadMessage, "|", "`", -1)
+	return codeBlock(moveThreadMessage)
 }
 
 func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (*model.CommandResponse, bool, error) {
