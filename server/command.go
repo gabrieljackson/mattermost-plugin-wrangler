@@ -10,21 +10,21 @@ import (
 
 const helpText = `Wrangler Plugin - Slash Command Help
 
-- /wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
-    Move a given message, along with the thread it belongs to, to a given channel
+/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
+  Move a given message, along with the thread it belongs to, to a given channel
     - This can be on any channel in any team that you have joined
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 
-- /wrangler list channels
-    List the IDs of all channels you have joined
+/wrangler list channels
+  List the IDs of all channels you have joined
 
-- /wrangler list messages [flags]
-    List the IDs of recent messages in this channel
+/wrangler list messages [flags]
+  List the IDs of recent messages in this channel
     Flags:
 %s
-- /wrangler info
-    Shows plugin information`
+/wrangler info
+  Shows plugin information`
 
 func getHelp() string {
 	return codeBlock(fmt.Sprintf(helpText, getListMessagesFlagSet().FlagUsages()))
