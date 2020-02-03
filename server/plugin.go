@@ -1,8 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
-	"path/filepath"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -43,30 +41,20 @@ func (p *Plugin) OnActivate() error {
 		return errors.Wrap(err, "invalid config")
 	}
 
-	botID, err := p.Helpers.EnsureBot(&model.Bot{
+	bot := &model.Bot{
 		Username:    "wrangler",
 		DisplayName: "Wrangler",
 		Description: "Created by the Wrangler plugin.",
-	})
+	}
+	options := []plugin.EnsureBotOption{
+		plugin.ProfileImagePath("assets/profile.png"),
+	}
+
+	botID, err := p.Helpers.EnsureBot(bot, options...)
 	if err != nil {
 		return errors.Wrap(err, "failed to ensure Wrangler bot")
 	}
 	p.BotUserID = botID
-
-	bundlePath, err := p.API.GetBundlePath()
-	if err != nil {
-		return errors.Wrap(err, "couldn't get bundle path")
-	}
-
-	profileImage, err := ioutil.ReadFile(filepath.Join(bundlePath, "assets", "profile.png"))
-	if err != nil {
-		return errors.Wrap(err, "couldn't read profile image")
-	}
-
-	appErr := p.API.SetProfileImage(botID, profileImage)
-	if appErr != nil {
-		return errors.Wrap(appErr, "couldn't set profile image")
-	}
 
 	return p.API.RegisterCommand(getCommand())
 }
