@@ -27,7 +27,7 @@ func TestMoveThreadCommand(t *testing.T) {
 	}
 
 	api := &plugintest.API{}
-	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGeneratePostList(3, originalChannel.Id), nil)
+	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGeneratePostList(3, originalChannel.Id, false), nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
 	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
@@ -75,15 +75,19 @@ func TestMoveThreadCommand(t *testing.T) {
 	})
 }
 
-func mockGeneratePostList(total int, channelID string) *model.PostList {
+func mockGeneratePostList(total int, channelID string, systemMessages bool) *model.PostList {
 	postList := model.NewPostList()
 	for i := 0; i < total; i++ {
 		id := model.NewId()
-		postList.AddPost(&model.Post{
+		post := &model.Post{
 			Id:        id,
 			ChannelId: channelID,
 			Message:   fmt.Sprintf("This is message %d", i),
-		})
+		}
+		if systemMessages {
+			post.Type = model.POST_SYSTEM_MESSAGE_PREFIX
+		}
+		postList.AddPost(post)
 		postList.AddOrder(id)
 	}
 
