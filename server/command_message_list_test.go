@@ -60,6 +60,32 @@ func TestMessagelListCommand(t *testing.T) {
 		assert.Contains(t, err.Error(), "count (120) must be between 1 and 100")
 	})
 
+	t.Run("specify valid trim-length", func(t *testing.T) {
+		resp, isUserError, err := plugin.runListMessagesCommand([]string{"--trim-length=60"}, &model.CommandArgs{ChannelId: testChannel.Id})
+		require.NoError(t, err)
+		assert.False(t, isUserError)
+		assert.Contains(t, resp.Text, "The last 20 messages in this channel")
+		for _, post := range testPostList.ToSlice() {
+			assert.Contains(t, resp.Text, post.Id)
+			assert.Contains(t, resp.Text, post.Message)
+			assert.Contains(t, resp.Text, post.Message)
+		}
+	})
+
+	t.Run("specify trim-length that is too low", func(t *testing.T) {
+		_, isUserError, err := plugin.runListMessagesCommand([]string{"--trim-length=-1"}, &model.CommandArgs{ChannelId: testChannel.Id})
+		require.Error(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, err.Error(), "trim-length (-1) must be between 10 and 500")
+	})
+
+	t.Run("specify trim-length that is too high", func(t *testing.T) {
+		_, isUserError, err := plugin.runListMessagesCommand([]string{"--trim-length=600"}, &model.CommandArgs{ChannelId: testChannel.Id})
+		require.Error(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, err.Error(), "trim-length (600) must be between 10 and 500")
+	})
+
 	t.Run("list messages successfully with system", func(t *testing.T) {
 		testPostList := mockGeneratePostList(3, testChannel.Id, true)
 
@@ -101,7 +127,7 @@ func TestTrimMessage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.want, trimMessage(tt.message))
+			require.Equal(t, tt.want, trimMessage(tt.message, 50))
 		})
 	}
 }
