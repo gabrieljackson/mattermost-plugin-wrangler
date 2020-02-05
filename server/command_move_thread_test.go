@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/mattermost/mattermost-server/v5/plugin/plugintest"
@@ -75,6 +76,31 @@ func TestMoveThreadCommand(t *testing.T) {
 	})
 }
 
+func TestSortedPostsFromPostList(t *testing.T) {
+	tests := []struct {
+		count int
+	}{
+		{count: 0},
+		{count: 1},
+		{count: 10},
+		{count: 100},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d messages", tt.count), func(t *testing.T) {
+			postList := mockGeneratePostList(tt.count, model.NewId(), false)
+			sortedPosts := sortedPostsFromPostList(postList)
+
+			require.Equal(t, len(postList.Posts), len(sortedPosts))
+			if len(sortedPosts) > 0 {
+				for _, post := range sortedPosts {
+					assert.NotNil(t, postList.Posts[post.Id])
+				}
+			}
+		})
+	}
+}
+
 func mockGeneratePostList(total int, channelID string, systemMessages bool) *model.PostList {
 	postList := model.NewPostList()
 	for i := 0; i < total; i++ {
@@ -83,12 +109,14 @@ func mockGeneratePostList(total int, channelID string, systemMessages bool) *mod
 			Id:        id,
 			ChannelId: channelID,
 			Message:   fmt.Sprintf("This is message %d", i),
+			CreateAt:  time.Now().Unix(),
 		}
 		if systemMessages {
 			post.Type = model.POST_SYSTEM_MESSAGE_PREFIX
 		}
 		postList.AddPost(post)
 		postList.AddOrder(id)
+		time.Sleep(time.Millisecond)
 	}
 
 	return postList
