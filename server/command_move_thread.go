@@ -71,11 +71,13 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	}
 
 	var finalList []*model.Post
-	var cleanupIDs []string
 	for i := range postList {
 		finalList = append(finalList, postList[len(postList)-i-1])
-		cleanupIDs = append(cleanupIDs, postList[i].Id)
 	}
+
+	// Cleanup is handled by simply deleting the root post. Any comments/replies
+	// are automatically marked as deleted for us.
+	cleanupID := finalList[0].Id
 
 	var newRootPost *model.Post
 
@@ -112,11 +114,9 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return nil, false, errors.Wrap(appErr, "unable to create new bot post")
 	}
 
-	for _, id := range cleanupIDs {
-		appErr = p.API.DeletePost(id)
-		if appErr != nil {
-			return nil, false, errors.Wrap(appErr, "unable to delete post")
-		}
+	appErr = p.API.DeletePost(cleanupID)
+	if appErr != nil {
+		return nil, false, errors.Wrap(appErr, "unable to delete post")
 	}
 
 	msg := fmt.Sprintf("A thread with %d posts has been moved [ team=%s, channel=%s ]", len(finalList), targetTeam.Name, targetChannel.Name)
