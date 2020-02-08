@@ -40,6 +40,13 @@
                 "type": "bool",
                 "help_text": "Control whether Wrangler is permitted to move message threads from direct message channels or not",
                 "default": false
+            },
+            {
+                "key": "MoveThreadFromGroupMessageChannelEnable",
+                "display_name": "Enable Moving Threads From Group Message Channels",
+                "type": "bool",
+                "help_text": "Control whether Wrangler is permitted to move message threads from group message channels or not",
+                "default": false
             }
         ]
     }
