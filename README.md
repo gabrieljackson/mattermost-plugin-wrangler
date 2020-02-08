@@ -2,9 +2,9 @@
 
 # Mattermost Wrangler Plugin
 
-A [Mattermost](https://mattermost.com) plugin for managing messages.
+[![CircleCI](https://circleci.com/gh/gabrieljackson/mattermost-plugin-wrangler.svg?style=shield)](https://circleci.com/gh/gabrieljackson/mattermost-plugin-wrangler) [![Go Report Card](https://goreportcard.com/badge/github.com/gabrieljackson/mattermost-plugin-wrangler)](https://goreportcard.com/report/github.com/gabrieljackson/mattermost-plugin-wrangler)
 
-[![CircleCI](https://circleci.com/gh/gabrieljackson/mattermost-plugin-wrangler.svg?style=shield)](https://circleci.com/gh/gabrieljackson/mattermost-plugin-wrangler)
+A [Mattermost](https://mattermost.com) plugin for managing messages.
 
 ## About
 
