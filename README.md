@@ -81,3 +81,4 @@ The following plugin configuration is available:
 
  - Allowed Email Domain: an optional setting to limit plugin usage to specific users
  - Max Thread Count Move Size: an optional setting to limit the size of threads that can be moved
+ - Enable Moving Threads From Private Channels: Control whether Wrangler is permitted to move message threads from private channels or not

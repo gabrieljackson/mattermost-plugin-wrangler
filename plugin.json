@@ -26,6 +26,13 @@
                 "display_name": "Max Thread Count Move Size",
                 "type": "text",
                 "help_text": "The maximum number of messages in a thread that is allowed to be moved by the plugin. Leave empty for unlimited messages."
+            },
+            {
+                "key": "MoveThreadFromPrivateChannelEnable",
+                "display_name": "Enable Moving Threads From Private Channels",
+                "type": "bool",
+                "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not",
+                "default": true
             }
         ]
     }
