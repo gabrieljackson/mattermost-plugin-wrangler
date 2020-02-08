@@ -16,6 +16,12 @@ func TestMoveThreadCommand(t *testing.T) {
 	originalChannel := &model.Channel{
 		Id:   model.NewId(),
 		Name: "original-channel",
+		Type: model.CHANNEL_OPEN,
+	}
+	privateChannel := &model.Channel{
+		Id:   model.NewId(),
+		Name: "private-channel",
+		Type: model.CHANNEL_PRIVATE,
 	}
 
 	targetTeam := &model.Team{
@@ -28,9 +34,11 @@ func TestMoveThreadCommand(t *testing.T) {
 	}
 
 	api := &plugintest.API{}
+	api.On("GetChannel", originalChannel.Id).Return(originalChannel, nil)
+	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
+	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
 	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGeneratePostList(3, originalChannel.Id, false), nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
-	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
@@ -50,6 +58,18 @@ func TestMoveThreadCommand(t *testing.T) {
 		require.NoError(t, err)
 		assert.True(t, isUserError)
 		assert.Contains(t, resp.Text, "Error: missing arguments")
+	})
+
+	t.Run("private channel", func(t *testing.T) {
+		t.Run("disabled", func(t *testing.T) {
+			plugin.setConfiguration(&configuration{MoveThreadFromPrivateChannelEnable: false})
+			require.NoError(t, plugin.configuration.IsValid())
+
+			resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: privateChannel.Id})
+			require.NoError(t, err)
+			assert.False(t, isUserError)
+			assert.Contains(t, resp.Text, "Wrangler is currently configured to not allow moving posts from private channels")
+		})
 	})
 
 	t.Run("move thread successfully", func(t *testing.T) {

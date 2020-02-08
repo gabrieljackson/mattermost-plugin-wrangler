@@ -27,6 +27,19 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	postID := args[0]
 	channelID := args[1]
 
+	config := p.getConfiguration()
+
+	originalChannel, appErr := p.API.GetChannel(extra.ChannelId)
+	if appErr != nil {
+		return nil, false, fmt.Errorf("unable to get channel with ID %s", extra.ChannelId)
+	}
+	switch originalChannel.Type {
+	case model.CHANNEL_PRIVATE:
+		if !config.MoveThreadFromPrivateChannelEnable {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving posts from private channels"), false, nil
+		}
+	}
+
 	postListResponse, appErr := p.API.GetPostThread(postID)
 	if appErr != nil {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: unable to get post with ID %s; ensure this is correct", postID)), true, nil
@@ -38,7 +51,6 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return nil, false, fmt.Errorf("Sorting the post list response for post %s resulted in no posts", postID)
 	}
 
-	config := p.getConfiguration()
 	if config.MaxThreadCountMoveSizeInt() != 0 && config.MaxThreadCountMoveSizeInt() < len(postList) {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: the thread is %d posts long, but the move thead command is configured to only move threads of up to %d posts", len(postList), config.MaxThreadCountMoveSizeInt())), true, nil
 	}
