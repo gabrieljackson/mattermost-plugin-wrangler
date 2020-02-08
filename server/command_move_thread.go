@@ -38,6 +38,10 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		if !config.MoveThreadFromPrivateChannelEnable {
 			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving posts from private channels"), false, nil
 		}
+	case model.CHANNEL_DIRECT:
+		if !config.MoveThreadFromDirectMessageChannelEnable {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving posts from direct message channels"), false, nil
+		}
 	}
 
 	postListResponse, appErr := p.API.GetPostThread(postID)
