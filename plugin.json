@@ -33,6 +33,13 @@
                 "type": "bool",
                 "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not",
                 "default": true
+            },
+            {
+                "key": "MoveThreadFromDirectMessageChannelEnable",
+                "display_name": "Enable Moving Threads From Direct Message Channels",
+                "type": "bool",
+                "help_text": "Control whether Wrangler is permitted to move message threads from direct message channels or not",
+                "default": false
             }
         ]
     }
