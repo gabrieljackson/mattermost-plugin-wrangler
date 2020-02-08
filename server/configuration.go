@@ -25,6 +25,7 @@ type configuration struct {
 	MaxThreadCountMoveSize                   string
 	MoveThreadFromPrivateChannelEnable       bool
 	MoveThreadFromDirectMessageChannelEnable bool
+	MoveThreadFromGroupMessageChannelEnable  bool
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if

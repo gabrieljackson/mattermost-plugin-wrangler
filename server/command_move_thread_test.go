@@ -28,6 +28,11 @@ func TestMoveThreadCommand(t *testing.T) {
 		Name: "private-channel",
 		Type: model.CHANNEL_DIRECT,
 	}
+	groupChannel := &model.Channel{
+		Id:   model.NewId(),
+		Name: "private-channel",
+		Type: model.CHANNEL_GROUP,
+	}
 
 	targetTeam := &model.Team{
 		Id:   model.NewId(),
@@ -42,6 +47,7 @@ func TestMoveThreadCommand(t *testing.T) {
 	api.On("GetChannel", originalChannel.Id).Return(originalChannel, nil)
 	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
 	api.On("GetChannel", directChannel.Id).Return(directChannel, nil)
+	api.On("GetChannel", groupChannel.Id).Return(groupChannel, nil)
 	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
 	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGeneratePostList(3, originalChannel.Id, false), nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
@@ -87,6 +93,18 @@ func TestMoveThreadCommand(t *testing.T) {
 			require.NoError(t, err)
 			assert.False(t, isUserError)
 			assert.Contains(t, resp.Text, "Wrangler is currently configured to not allow moving posts from direct message channels")
+		})
+	})
+
+	t.Run("group channel", func(t *testing.T) {
+		t.Run("disabled", func(t *testing.T) {
+			plugin.setConfiguration(&configuration{MoveThreadFromGroupMessageChannelEnable: false})
+			require.NoError(t, plugin.configuration.IsValid())
+
+			resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: groupChannel.Id})
+			require.NoError(t, err)
+			assert.False(t, isUserError)
+			assert.Contains(t, resp.Text, "Wrangler is currently configured to not allow moving posts from group message channels")
 		})
 	})
 
