@@ -102,6 +102,38 @@ func TestMessagelListCommand(t *testing.T) {
 	})
 }
 
+func TestCleanMessage(t *testing.T) {
+	tests := []struct {
+		name    string
+		message string
+	}{
+		{
+			name:    "no cleanup needed",
+			message: "short",
+		},
+		{
+			name:    "remove codeblock",
+			message: "```code goes here```",
+		},
+		{
+			name:    "remove newlines",
+			message: "this message \n has multiple \n newlines \n probably",
+		},
+		{
+			name:    "remove codeblock and newlines",
+			message: "this `` ` ```message \n has` ``` multiple \n newlines \n probably ` ````",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleanedMessage := cleanMessage(tt.message)
+			assert.NotContains(t, cleanedMessage, "```")
+			assert.NotContains(t, cleanedMessage, "\n")
+		})
+	}
+}
+
 func TestTrimMessage(t *testing.T) {
 	tests := []struct {
 		name    string
