@@ -18,7 +18,8 @@ const helpText = `Wrangler Plugin - Slash Command Help
 
 /wrangler list channels
   List the IDs of all channels you have joined
-
+	Flags:
+%s
 /wrangler list messages [flags]
   List the IDs of recent messages in this channel
     Flags:
@@ -27,7 +28,11 @@ const helpText = `Wrangler Plugin - Slash Command Help
   Shows plugin information`
 
 func getHelp() string {
-	return codeBlock(fmt.Sprintf(helpText, getListMessagesFlagSet().FlagUsages()))
+	return codeBlock(fmt.Sprintf(
+		helpText,
+		getListChannelsFlagSet().FlagUsages(),
+		getListMessagesFlagSet().FlagUsages(),
+	))
 }
 
 func getCommand() *model.Command {
