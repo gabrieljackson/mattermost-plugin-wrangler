@@ -16,7 +16,7 @@ const helpText = `Wrangler Plugin - Slash Command Help
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 
-/wrangler list channels
+/wrangler list channels [flags]
   List the IDs of all channels you have joined
 	Flags:
 %s

@@ -35,13 +35,17 @@ Wrangler Plugin - Slash Command Help
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 
-/wrangler list channels
+/wrangler list channels [flags]
   List the IDs of all channels you have joined
+    Flags:
+      --channel-filter string   A filter value that channel names must contain to be shown on the list
+      --team-filter string      A filter value that team names must contain to be shown on the list
 
 /wrangler list messages [flags]
   List the IDs of recent messages in this channel
     Flags:
-      --count int   Number of messages to return. Must be between 1 and 100 (default 20)
+      --count int         Number of messages to return. Must be between 1 and 100 (default 20)
+      --trim-length int   The max character count of messages listed before they are trimmed. Must be between 10 and 500 (default 50)
 
 /wrangler info
   Shows plugin information
@@ -82,3 +86,5 @@ The following plugin configuration is available:
  - Allowed Email Domain: an optional setting to limit plugin usage to specific users
  - Max Thread Count Move Size: an optional setting to limit the size of threads that can be moved
  - Enable Moving Threads From Private Channels: Control whether Wrangler is permitted to move message threads from private channels or not
+ - Enable Moving Threads From Direct Message Channels: Control whether Wrangler is permitted to move message threads from direct message channels or not
+ - Enable Moving Threads From Group Message Channels: Control whether Wrangler is permitted to move message threads from group message channels or not
