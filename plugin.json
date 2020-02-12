@@ -32,7 +32,7 @@
                 "display_name": "Enable Moving Threads From Private Channels",
                 "type": "bool",
                 "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not",
-                "default": true
+                "default": false
             },
             {
                 "key": "MoveThreadFromDirectMessageChannelEnable",
