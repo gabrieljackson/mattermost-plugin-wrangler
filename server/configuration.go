@@ -24,6 +24,7 @@ type configuration struct {
 	AllowedEmailDomain string
 
 	MoveThreadMaxCount                       string
+	MoveThreadToAnotherTeamEnable            bool
 	MoveThreadFromPrivateChannelEnable       bool
 	MoveThreadFromDirectMessageChannelEnable bool
 	MoveThreadFromGroupMessageChannelEnable  bool

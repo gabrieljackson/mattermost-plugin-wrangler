@@ -13,25 +13,33 @@ import (
 )
 
 func TestMoveThreadCommand(t *testing.T) {
-	originalChannel := &model.Channel{
+	team1 := &model.Team{
 		Id:   model.NewId(),
-		Name: "original-channel",
-		Type: model.CHANNEL_OPEN,
+		Name: "team-1",
+	}
+	originalChannel := &model.Channel{
+		Id:     model.NewId(),
+		TeamId: team1.Id,
+		Name:   "original-channel",
+		Type:   model.CHANNEL_OPEN,
 	}
 	privateChannel := &model.Channel{
-		Id:   model.NewId(),
-		Name: "private-channel",
-		Type: model.CHANNEL_PRIVATE,
+		Id:     model.NewId(),
+		TeamId: team1.Id,
+		Name:   "private-channel",
+		Type:   model.CHANNEL_PRIVATE,
 	}
 	directChannel := &model.Channel{
-		Id:   model.NewId(),
-		Name: "private-channel",
-		Type: model.CHANNEL_DIRECT,
+		Id:     model.NewId(),
+		TeamId: team1.Id,
+		Name:   "private-channel",
+		Type:   model.CHANNEL_DIRECT,
 	}
 	groupChannel := &model.Channel{
-		Id:   model.NewId(),
-		Name: "private-channel",
-		Type: model.CHANNEL_GROUP,
+		Id:     model.NewId(),
+		TeamId: team1.Id,
+		Name:   "private-channel",
+		Type:   model.CHANNEL_GROUP,
 	}
 
 	targetTeam := &model.Team{
@@ -39,8 +47,9 @@ func TestMoveThreadCommand(t *testing.T) {
 		Name: "target-team",
 	}
 	targetChannel := &model.Channel{
-		Id:   model.NewId(),
-		Name: "target-channel",
+		Id:     model.NewId(),
+		TeamId: targetTeam.Id,
+		Name:   "target-channel",
 	}
 
 	api := &plugintest.API{}
@@ -117,7 +126,22 @@ func TestMoveThreadCommand(t *testing.T) {
 		})
 	})
 
+	t.Run("to another team", func(t *testing.T) {
+		t.Run("disabled", func(t *testing.T) {
+			plugin.setConfiguration(&configuration{MoveThreadToAnotherTeamEnable: false})
+			require.NoError(t, plugin.configuration.IsValid())
+
+			resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
+			require.NoError(t, err)
+			assert.False(t, isUserError)
+			assert.Contains(t, resp.Text, "Wrangler is currently configured to not allow moving messages to different teams")
+		})
+	})
+
 	t.Run("move thread successfully", func(t *testing.T) {
+		plugin.setConfiguration(&configuration{MoveThreadToAnotherTeamEnable: true})
+		require.NoError(t, plugin.configuration.IsValid())
+
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
