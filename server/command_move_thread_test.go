@@ -54,6 +54,15 @@ func TestMoveThreadCommand(t *testing.T) {
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
+	api.On("LogInfo",
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+	).Return(nil)
 
 	var plugin Plugin
 	plugin.SetAPI(api)

@@ -94,6 +94,13 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 
 	var newRootPost *model.Post
 
+	// Begin creating the new thread.
+	p.API.LogInfo("Wrangler is moving a thread",
+		"user_id", extra.UserId,
+		"original_post_id", cleanupID,
+		"original_channel_id", originalChannel.Id,
+	)
+
 	for i, post := range postList {
 		if i == 0 {
 			cleanPost(post)
@@ -131,6 +138,12 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	if appErr != nil {
 		return nil, false, errors.Wrap(appErr, "unable to delete post")
 	}
+
+	p.API.LogInfo("Wrangler thread move complete",
+		"user_id", extra.UserId,
+		"new_post_id", newRootPost.Id,
+		"new_channel_id", channelID,
+	)
 
 	msg := fmt.Sprintf("A thread with %d posts has been moved [ team=%s, channel=%s ]", len(postList), targetTeam.Name, targetChannel.Name)
 
