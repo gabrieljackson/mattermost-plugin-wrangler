@@ -72,16 +72,19 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: channel with ID %s doesn't exist or you are not a member", channelID)), true, nil
 	}
 
+	targetChannel, appErr := p.API.GetChannel(channelID)
+	if appErr != nil {
+		return nil, false, fmt.Errorf("unable to get channel with ID %s", channelID)
+	}
+	if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != extra.TeamId {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
+	}
+
 	// We now know:
 	// 1. The postID is valid.
 	// 2. The channelID is valid and the user is a member of that channel.
 	// 3. The command was run from the original channel with the post, so they
 	//    are also a member of that channel.
-
-	targetChannel, appErr := p.API.GetChannel(channelID)
-	if appErr != nil {
-		return nil, false, fmt.Errorf("unable to get channel with ID %s", channelID)
-	}
 
 	targetTeam, appErr := p.API.GetTeam(targetChannel.TeamId)
 	if appErr != nil {

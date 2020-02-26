@@ -28,6 +28,13 @@
                 "help_text": "The maximum number of messages in a thread that the plugin is allowed to move. Leave empty for unlimited messages."
             },
             {
+                "key": "MoveThreadToAnotherTeamEnable",
+                "display_name": "Enable Moving Threads To Different Teams",
+                "type": "bool",
+                "help_text": "Control whether Wrangler is permitted to move message threads from one team to another",
+                "default": false
+            },
+            {
                 "key": "MoveThreadFromPrivateChannelEnable",
                 "display_name": "Enable Moving Threads From Private Channels",
                 "type": "bool",
