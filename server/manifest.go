@@ -5,5 +5,5 @@ var manifest = struct {
 	Version string
 }{
 	ID:      "com.mattermost.wrangler",
-	Version: "0.1.0",
+	Version: "0.2.0",
 }
