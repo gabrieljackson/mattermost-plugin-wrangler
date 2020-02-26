@@ -22,10 +22,10 @@
                 "help_text": "(Optional) When set, users must have an email ending in this domain to use the wrangler slash command."
             },
             {
-                "key": "MaxThreadCountMoveSize",
+                "key": "MoveThreadMaxCount",
                 "display_name": "Max Thread Count Move Size",
                 "type": "text",
-                "help_text": "The maximum number of messages in a thread that is allowed to be moved by the plugin. Leave empty for unlimited messages."
+                "help_text": "The maximum number of messages in a thread that the plugin is allowed to move. Leave empty for unlimited messages."
             },
             {
                 "key": "MoveThreadFromPrivateChannelEnable",

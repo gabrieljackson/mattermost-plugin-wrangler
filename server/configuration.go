@@ -21,8 +21,9 @@ import (
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
 type configuration struct {
-	AllowedEmailDomain                       string
-	MaxThreadCountMoveSize                   string
+	AllowedEmailDomain string
+
+	MoveThreadMaxCount                       string
 	MoveThreadFromPrivateChannelEnable       bool
 	MoveThreadFromDirectMessageChannelEnable bool
 	MoveThreadFromGroupMessageChannelEnable  bool
@@ -41,9 +42,9 @@ func (c *configuration) IsValid() error {
 		return errors.Wrap(err, "invalid AllowedEmailDomain")
 	}
 
-	_, err = parseAndValidateMaxThreadCountMoveSize(c.MaxThreadCountMoveSize)
+	_, err = parseAndValidateMaxThreadCountMoveSize(c.MoveThreadMaxCount)
 	if err != nil {
-		return errors.Wrap(err, "invalid MaxThreadCountMoveSize")
+		return errors.Wrap(err, "invalid MoveThreadMaxSize")
 	}
 
 	return nil
@@ -51,7 +52,7 @@ func (c *configuration) IsValid() error {
 
 func (c *configuration) MaxThreadCountMoveSizeInt() int {
 	// Use the parseAndValidate function, but ignore the error.
-	i, _ := parseAndValidateMaxThreadCountMoveSize(c.MaxThreadCountMoveSize)
+	i, _ := parseAndValidateMaxThreadCountMoveSize(c.MoveThreadMaxCount)
 
 	return i
 }
@@ -67,10 +68,10 @@ func parseAndValidateMaxThreadCountMoveSize(s string) (int, error) {
 
 	max, err := strconv.Atoi(s)
 	if err != nil {
-		return 0, errors.Wrapf(err, "MaxThreadCountMoveSize value %s is not a valid integer", s)
+		return 0, errors.Wrapf(err, "MoveThreadMaxSize value %s is not a valid integer", s)
 	}
 	if max < 1 {
-		return 0, fmt.Errorf("MaxThreadCountMoveSize (%d) must be greater than 0", max)
+		return 0, fmt.Errorf("MoveThreadMaxSize (%d) must be greater than 0", max)
 	}
 
 	return max, nil
