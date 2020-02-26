@@ -1,4 +1,4 @@
-module github.com/mattermost/mattermost-plugin-starter-template
+module github.com/gabrieljackson/mattermost-plugin-wrangler
 
 go 1.13
 
