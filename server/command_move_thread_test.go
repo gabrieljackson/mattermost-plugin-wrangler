@@ -146,6 +146,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		require.NoError(t, err)
 		assert.False(t, isUserError)
 		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with %d posts has been moved [ team=%s, channel=%s ]", 3, targetTeam.Name, targetChannel.Name))
+		assert.Contains(t, resp.Text, quoteBlock("This is message 1"))
 	})
 
 	t.Run("not in thread channel", func(t *testing.T) {
@@ -178,11 +179,11 @@ func TestSortedPostsFromPostList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d messages", tt.count), func(t *testing.T) {
 			postList := mockGeneratePostList(tt.count, model.NewId(), false)
-			sortedPosts := sortedPostsFromPostList(postList)
+			wpl := buildWranglerPostList(postList)
 
-			require.Equal(t, len(postList.Posts), len(sortedPosts))
-			if len(sortedPosts) > 0 {
-				for _, post := range sortedPosts {
+			require.Equal(t, len(postList.Posts), wpl.NumPosts())
+			if wpl.NumPosts() > 0 {
+				for _, post := range wpl.Posts {
 					assert.NotNil(t, postList.Posts[post.Id])
 				}
 			}
@@ -197,7 +198,7 @@ func mockGeneratePostList(total int, channelID string, systemMessages bool) *mod
 		post := &model.Post{
 			Id:        id,
 			ChannelId: channelID,
-			Message:   fmt.Sprintf("This is message %d", i),
+			Message:   fmt.Sprintf("This is message %d", total-i),
 			CreateAt:  time.Now().Unix(),
 		}
 		if systemMessages {

@@ -83,22 +83,3 @@ func (p *Plugin) runListMessagesCommand(args []string, extra *model.CommandArgs)
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, msg), false, nil
 }
-
-func cleanAndTrimMessage(message string, trimLength int) string {
-	return trimMessage(cleanMessage(message), trimLength)
-}
-
-func cleanMessage(message string) string {
-	message = strings.Replace(message, "```", "", -1)
-	message = strings.Replace(message, "\n", " | ", -1)
-
-	return message
-}
-
-func trimMessage(message string, trimLength int) string {
-	if len(message) <= trimLength {
-		return message
-	}
-
-	return fmt.Sprintf("%s...", message[:trimLength])
-}
