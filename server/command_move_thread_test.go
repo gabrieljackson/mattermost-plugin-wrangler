@@ -123,7 +123,7 @@ func TestMoveThreadCommand(t *testing.T) {
 	})
 
 	t.Run("thread is above configuration move-maximum", func(t *testing.T) {
-		plugin.setConfiguration(&configuration{MaxThreadCountMoveSize: "1"})
+		plugin.setConfiguration(&configuration{MoveThreadMaxCount: "1"})
 		require.NoError(t, plugin.configuration.IsValid())
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: model.NewId()})
 		require.NoError(t, err)
