@@ -165,10 +165,3 @@ func sortedPostsFromPostList(postList *model.PostList) []*model.Post {
 
 	return reversedPosts
 }
-
-func cleanPost(post *model.Post) {
-	post.Id = ""
-	post.CreateAt = 0
-	post.UpdateAt = 0
-	post.EditAt = 0
-}

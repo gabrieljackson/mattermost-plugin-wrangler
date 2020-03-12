@@ -4,7 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
+	"github.com/mattermost/mattermost-server/v5/model"
 )
+
+func cleanPost(post *model.Post) {
+	post.Id = ""
+	post.CreateAt = 0
+	post.UpdateAt = 0
+	post.EditAt = 0
+}
 
 func prettyPrintJSON(in string) string {
 	var out bytes.Buffer

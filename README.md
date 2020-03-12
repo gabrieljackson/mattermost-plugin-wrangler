@@ -35,6 +35,10 @@ Wrangler Plugin - Slash Command Help
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 
+/wrangler attach message [MESSAGE_ID_TO_BE_ATTACHED] [ROOT_MESSAGE_ID]
+  Attach a given message to a thread in the same channel
+    - Obtain the message IDs by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
+
 /wrangler list channels [flags]
   List the IDs of all channels you have joined
     Flags:
@@ -66,6 +70,12 @@ A thread that was started in `channel1` is moved to `channel2`.
 The thread after being "moved" to `channel2`.
 
 ![channel2](https://user-images.githubusercontent.com/3694686/73672959-d499ea80-467b-11ea-97dc-4a2e33c8829e.png)
+
+#### /wrangler attach message
+
+Attaches a message that is not currently in a thread to an existing message or thread in the same channel.
+
+This is useful for bringing normal messages about a topic into threads that they relate to.
 
 #### /wrangler list channels
 

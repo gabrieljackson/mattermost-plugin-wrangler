@@ -16,6 +16,10 @@ const helpText = `Wrangler Plugin - Slash Command Help
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 
+/wrangler attach message [MESSAGE_ID_TO_BE_ATTACHED] [ROOT_MESSAGE_ID]
+  Attach a given message to a thread in the same channel
+    - Obtain the message IDs by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
+
 /wrangler list channels [flags]
   List the IDs of all channels you have joined
 	Flags:
@@ -89,6 +93,16 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		switch stringArgs[2] {
 		case "thread":
 			handler = p.runMoveThreadCommand
+			stringArgs = stringArgs[3:]
+		}
+	case "attach":
+		if len(stringArgs) < 3 {
+			break
+		}
+
+		switch stringArgs[2] {
+		case "message":
+			handler = p.runAttachMessageCommand
 			stringArgs = stringArgs[3:]
 		}
 	case "list":
