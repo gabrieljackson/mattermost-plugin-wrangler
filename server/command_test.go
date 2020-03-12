@@ -26,39 +26,75 @@ func TestCommand(t *testing.T) {
 	var plugin Plugin
 	plugin.SetAPI(api)
 
-	t.Run("no args", func(t *testing.T) {
-		args := &model.CommandArgs{}
-		resp, appErr := plugin.ExecuteCommand(context, args)
-		require.Nil(t, appErr)
-		require.Equal(t, resp.Text, getHelp())
-	})
+	t.Run("args", func(t *testing.T) {
+		t.Run("no args", func(t *testing.T) {
+			args := &model.CommandArgs{}
+			resp, appErr := plugin.ExecuteCommand(context, args)
+			require.Nil(t, appErr)
+			require.Equal(t, resp.Text, getHelp())
+		})
 
-	t.Run("one arg", func(t *testing.T) {
-		args := &model.CommandArgs{Command: "one"}
-		resp, appErr := plugin.ExecuteCommand(context, args)
-		require.Nil(t, appErr)
-		require.Equal(t, resp.Text, getHelp())
-	})
+		t.Run("one arg", func(t *testing.T) {
+			args := &model.CommandArgs{Command: "one"}
+			resp, appErr := plugin.ExecuteCommand(context, args)
+			require.Nil(t, appErr)
+			require.Equal(t, resp.Text, getHelp())
+		})
 
-	t.Run("two args, invalid command", func(t *testing.T) {
-		args := &model.CommandArgs{Command: "one two"}
-		resp, appErr := plugin.ExecuteCommand(context, args)
-		require.Nil(t, appErr)
-		require.Equal(t, resp.Text, getHelp())
-	})
+		t.Run("two args, invalid command", func(t *testing.T) {
+			args := &model.CommandArgs{Command: "one two"}
+			resp, appErr := plugin.ExecuteCommand(context, args)
+			require.Nil(t, appErr)
+			require.Equal(t, resp.Text, getHelp())
+		})
 
-	t.Run("move command, missing extra args", func(t *testing.T) {
-		args := &model.CommandArgs{Command: "wrangler move"}
-		resp, appErr := plugin.ExecuteCommand(context, args)
-		require.Nil(t, appErr)
-		require.Equal(t, resp.Text, getHelp())
-	})
+		t.Run("move command", func(t *testing.T) {
+			t.Run("missing extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler move"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
 
-	t.Run("list command, missing extra args", func(t *testing.T) {
-		args := &model.CommandArgs{Command: "wrangler list"}
-		resp, appErr := plugin.ExecuteCommand(context, args)
-		require.Nil(t, appErr)
-		require.Equal(t, resp.Text, getHelp())
+			t.Run("invalid extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler move invalid"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+		})
+
+		t.Run("attach command", func(t *testing.T) {
+			t.Run("missing extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler attach"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+
+			t.Run("invalid extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler attach invalid"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+		})
+
+		t.Run("list command", func(t *testing.T) {
+			t.Run("missing extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler list"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+
+			t.Run("invalid extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler list invalid"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+		})
 	})
 
 	t.Run("info command", func(t *testing.T) {
