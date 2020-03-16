@@ -2,16 +2,10 @@ GO ?= $(shell command -v go 2> /dev/null)
 NPM ?= $(shell command -v npm 2> /dev/null)
 CURL ?= $(shell command -v curl 2> /dev/null)
 MANIFEST_FILE ?= plugin.json
+GOPATH ?= $(shell go env GOPATH)
 GO_TEST_FLAGS ?= -race
 GO_BUILD_FLAGS ?=
 MM_UTILITIES_DIR ?= ../mattermost-utilities
-
-BUILD_DATE = $(shell date -u)
-BUILD_HASH = $(shell git rev-parse HEAD)
-BUILD_HASH_SHORT = $(shell git rev-parse --short HEAD)
-LDFLAGS += -X "main.BuildDate=$(BUILD_DATE)"
-LDFLAGS += -X "main.BuildHash=$(BUILD_HASH)"
-LDFLAGS += -X "main.BuildHashShort=$(BUILD_HASH_SHORT)"
 
 export GO111MODULE=on
 
@@ -23,7 +17,7 @@ include build/setup.mk
 
 BUNDLE_NAME ?= $(PLUGIN_ID)-$(PLUGIN_VERSION).tar.gz
 
-# Include custom makefile, if pressent
+# Include custom makefile, if present
 ifneq ($(wildcard build/custom.mk),)
 	include build/custom.mk
 endif
@@ -82,7 +76,7 @@ endif
 golint:
 	@echo Running lint
 	env GO111MODULE=off $(GO) get golang.org/x/lint/golint
-	golint -set_exit_status ./...
+	$(GOPATH)/bin/golint -set_exit_status ./...
 	@echo lint success
 
 ## Builds the server, if it exists, including support for multiple architectures.
@@ -107,6 +101,13 @@ endif
 webapp: webapp/.npminstall
 ifneq ($(HAS_WEBAPP),)
 	cd webapp && $(NPM) run build;
+endif
+
+## Builds the webapp in debug mode, if it exists.
+webapp-debug: webapp/.npminstall
+ifneq ($(HAS_WEBAPP),)
+	cd webapp && \
+	$(NPM) run debug;
 endif
 
 ## Generates a tar bundle of the plugin for install.
@@ -138,23 +139,17 @@ endif
 dist:	apply server webapp bundle
 
 ## Installs the plugin to a (development) server.
+## It uses the API if appropriate environment variables are defined,
+## and otherwise falls back to trying to copy the plugin to a sibling mattermost-server directory.
 .PHONY: deploy
 deploy: dist
-## It uses the API if appropriate environment variables are defined,
-## or copying the files directly to a sibling mattermost-server directory.
-ifneq ($(and $(MM_SERVICESETTINGS_SITEURL),$(MM_ADMIN_USERNAME),$(MM_ADMIN_PASSWORD),$(CURL)),)
-	@echo "Installing plugin via API"
-	$(eval TOKEN := $(shell curl -i --post301 --location $(MM_SERVICESETTINGS_SITEURL) -X POST $(MM_SERVICESETTINGS_SITEURL)/api/v4/users/login -d '{"login_id": "$(MM_ADMIN_USERNAME)", "password": "$(MM_ADMIN_PASSWORD)"}' | grep Token | cut -f2 -d' ' 2> /dev/null))
-	@curl -s --post301 --location $(MM_SERVICESETTINGS_SITEURL) -H "Authorization: Bearer $(TOKEN)" -X POST $(MM_SERVICESETTINGS_SITEURL)/api/v4/plugins -F "plugin=@dist/$(BUNDLE_NAME)" -F "force=true" > /dev/null && \
-		curl -s --post301 --location $(MM_SERVICESETTINGS_SITEURL) -H "Authorization: Bearer $(TOKEN)" -X POST $(MM_SERVICESETTINGS_SITEURL)/api/v4/plugins/$(PLUGIN_ID)/enable > /dev/null && \
-		echo "OK." || echo "Sorry, something went wrong."
-else ifneq ($(wildcard ../mattermost-server/.*),)
-	@echo "Installing plugin via filesystem. Server restart and manual plugin enabling required"
-	mkdir -p ../mattermost-server/plugins
-	tar -C ../mattermost-server/plugins -zxvf dist/$(BUNDLE_NAME)
-else
-	@echo "No supported deployment method available. Install plugin manually."
-endif
+	./build/bin/deploy $(PLUGIN_ID) dist/$(BUNDLE_NAME)
+
+.PHONY: debug-deploy
+debug-deploy: debug-dist deploy
+
+.PHONY: debug-dist
+debug-dist: apply server webapp-debug bundle
 
 ## Runs any lints and unit tests defined for the server and webapp, if they exist.
 .PHONY: test
@@ -163,7 +158,7 @@ ifneq ($(HAS_SERVER),)
 	$(GO) test -v $(GO_TEST_FLAGS) -ldflags '$(LDFLAGS)' ./server/...
 endif
 ifneq ($(HAS_WEBAPP),)
-	cd webapp && $(NPM) run fix;
+	cd webapp && $(NPM) run fix && $(NPM) run test;
 endif
 
 ## Creates a coverage report for the server code.
@@ -199,6 +194,6 @@ ifneq ($(HAS_WEBAPP),)
 endif
 	rm -fr build/bin/
 
-# Help documentatin à la https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+# Help documentation à la https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
 	@cat Makefile | grep -v '\.PHONY' |  grep -v '\help:' | grep -B1 -E '^[a-zA-Z0-9_.-]+:.*' | sed -e "s/:.*//" | sed -e "s/^## //" |  grep -v '\-\-' | sed '1!G;h;$$!d' | awk 'NR%2{printf "\033[36m%-30s\033[0m",$$0;next;}1' | sort

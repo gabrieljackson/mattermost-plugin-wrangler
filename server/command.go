@@ -55,7 +55,7 @@ func getCommandResponse(responseType, text string) *model.CommandResponse {
 		ResponseType: responseType,
 		Text:         text,
 		Username:     "wrangler",
-		IconURL:      fmt.Sprintf("/plugins/%s/profile.png", manifest.ID),
+		IconURL:      fmt.Sprintf("/plugins/%s/profile.png", manifest.Id),
 	}
 }
 
