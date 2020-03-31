@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
@@ -13,6 +14,25 @@ func cleanPost(post *model.Post) {
 	post.CreateAt = 0
 	post.UpdateAt = 0
 	post.EditAt = 0
+}
+
+func cleanAndTrimMessage(message string, trimLength int) string {
+	return trimMessage(cleanMessage(message), trimLength)
+}
+
+func cleanMessage(message string) string {
+	message = strings.Replace(message, "```", "", -1)
+	message = strings.Replace(message, "\n", " | ", -1)
+
+	return message
+}
+
+func trimMessage(message string, trimLength int) string {
+	if len(message) <= trimLength {
+		return message
+	}
+
+	return fmt.Sprintf("%s...", message[:trimLength])
 }
 
 func prettyPrintJSON(in string) string {
@@ -30,6 +50,10 @@ func jsonCodeBlock(in string) string {
 
 func codeBlock(in string) string {
 	return fmt.Sprintf("```\n%s\n```", in)
+}
+
+func quoteBlock(in string) string {
+	return fmt.Sprintf("> %s", in)
 }
 
 func inlineCode(in string) string {
