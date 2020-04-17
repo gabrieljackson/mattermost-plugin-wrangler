@@ -52,6 +52,12 @@ func TestMoveThreadCommand(t *testing.T) {
 		Name:   "target-channel",
 	}
 
+	config := &model.Config{
+		ServiceSettings: model.ServiceSettings{
+			SiteURL: NewString("test.sampledomain.com"),
+		},
+	}
+
 	api := &plugintest.API{}
 	api.On("GetChannel", originalChannel.Id).Return(originalChannel, nil)
 	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
@@ -63,6 +69,7 @@ func TestMoveThreadCommand(t *testing.T) {
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
+	api.On("GetConfig", mock.Anything).Return(config)
 	api.On("LogInfo",
 		mock.AnythingOfTypeArgument("string"),
 		mock.AnythingOfTypeArgument("string"),
@@ -145,7 +152,11 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
-		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with %d posts has been moved [ team=%s, channel=%s ]", 3, targetTeam.Name, targetChannel.Name))
+		assert.Contains(t, resp.Text, fmt.Sprintf("A thread has been moved: %s", makePostLink(*config.ServiceSettings.SiteURL, "")))
+		assert.Contains(t, resp.Text, fmt.Sprintf(
+			"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
+			targetTeam.Name, targetChannel.Name, 3,
+		))
 		assert.Contains(t, resp.Text, quoteBlock("This is message 1"))
 	})
 
