@@ -64,7 +64,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	}
 
 	if wpl.Posts[0].ChannelId != extra.ChannelId {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the move command must be run from the channel containing the post"), true, nil
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the 'move thread' command must be run from the channel containing the post"), true, nil
 	}
 
 	_, appErr = p.API.GetChannelMember(channelID, extra.UserId)
@@ -78,6 +78,10 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	}
 	if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != extra.TeamId {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
+	}
+
+	if extra.RootId == wpl.Posts[0].Id || extra.ParentId == wpl.Posts[0].Id {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the 'move thread' command cannot be run from inside the thread being moved; please run directly in the channel containing the thread you wish to move"), true, nil
 	}
 
 	// We now know:

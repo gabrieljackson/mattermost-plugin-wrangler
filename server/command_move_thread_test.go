@@ -58,13 +58,15 @@ func TestMoveThreadCommand(t *testing.T) {
 		},
 	}
 
+	generatedPosts := mockGeneratePostList(3, originalChannel.Id, false)
+
 	api := &plugintest.API{}
 	api.On("GetChannel", originalChannel.Id).Return(originalChannel, nil)
 	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
 	api.On("GetChannel", directChannel.Id).Return(directChannel, nil)
 	api.On("GetChannel", groupChannel.Id).Return(groupChannel, nil)
 	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
-	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGeneratePostList(3, originalChannel.Id, false), nil)
+	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(generatedPosts, nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
@@ -145,8 +147,37 @@ func TestMoveThreadCommand(t *testing.T) {
 		})
 	})
 
-	t.Run("move thread successfully", func(t *testing.T) {
+	t.Run("invalid command run location", func(t *testing.T) {
 		plugin.setConfiguration(&configuration{MoveThreadToAnotherTeamEnable: true})
+
+		t.Run("not in thread channel", func(t *testing.T) {
+			resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: model.NewId()})
+			require.NoError(t, err)
+			assert.True(t, isUserError)
+			assert.Contains(t, resp.Text, "Error: the 'move thread' command must be run from the channel containing the post")
+		})
+
+		postSlice := generatedPosts.ToSlice()
+		rootPostID := postSlice[len(postSlice)-1].Id
+
+		t.Run("in thread being moved", func(t *testing.T) {
+			t.Run("parentId matches", func(t *testing.T) {
+				resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id, ParentId: rootPostID})
+				require.NoError(t, err)
+				assert.True(t, isUserError)
+				assert.Contains(t, resp.Text, "Error: the 'move thread' command cannot be run from inside the thread being moved; please run directly in the channel containing the thread you wish to move")
+			})
+
+			t.Run("rootId matches", func(t *testing.T) {
+				resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id, RootId: rootPostID})
+				require.NoError(t, err)
+				assert.True(t, isUserError)
+				assert.Contains(t, resp.Text, "Error: the 'move thread' command cannot be run from inside the thread being moved; please run directly in the channel containing the thread you wish to move")
+			})
+		})
+	})
+
+	t.Run("move thread successfully", func(t *testing.T) {
 		require.NoError(t, plugin.configuration.IsValid())
 
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
@@ -158,13 +189,6 @@ func TestMoveThreadCommand(t *testing.T) {
 			targetTeam.Name, targetChannel.Name, 3,
 		))
 		assert.Contains(t, resp.Text, quoteBlock("This is message 1"))
-	})
-
-	t.Run("not in thread channel", func(t *testing.T) {
-		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: model.NewId()})
-		require.NoError(t, err)
-		assert.True(t, isUserError)
-		assert.Contains(t, resp.Text, "Error: the move command must be run from the channel containing the post")
 	})
 
 	t.Run("thread is above configuration move-maximum", func(t *testing.T) {
