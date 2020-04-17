@@ -113,7 +113,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 			if appErr != nil {
 				return nil, false, errors.Wrap(appErr, "unable to create new root post")
 			}
-			originalMessageSummary = cleanAndTrimMessage(post.Message, 100)
+			originalMessageSummary = cleanAndTrimMessage(post.Message, 500)
 
 			continue
 		}
@@ -150,12 +150,12 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		"new_channel_id", channelID,
 	)
 
-	msg := fmt.Sprintf(
-		"A thread with %d posts has been moved [ team=%s, channel=%s ]\n\nOriginal Message:\n%s",
-		wpl.NumPosts(),
-		targetTeam.Name, targetChannel.Name,
-		quoteBlock(originalMessageSummary),
+	msg := fmt.Sprintf("A thread has been moved: %s\n", makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newRootPost.Id))
+	msg += fmt.Sprintf(
+		"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
+		targetTeam.Name, targetChannel.Name, wpl.NumPosts(),
 	)
+	msg += fmt.Sprintf("Original Thread Root Message:\n%s\n", quoteBlock(originalMessageSummary))
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_IN_CHANNEL, msg), false, nil
 }
