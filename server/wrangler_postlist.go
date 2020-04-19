@@ -19,6 +19,15 @@ func (wpl *WranglerPostList) NumPosts() int {
 	return len(wpl.Posts)
 }
 
+// RootPost returns the root post in a post list.
+func (wpl *WranglerPostList) RootPost() *model.Post {
+	if wpl.NumPosts() < 1 {
+		return nil
+	}
+
+	return wpl.Posts[0]
+}
+
 func buildWranglerPostList(postList *model.PostList) *WranglerPostList {
 	wpl := &WranglerPostList{}
 
@@ -52,7 +61,7 @@ func buildWranglerPostList(postList *model.PostList) *WranglerPostList {
 	}
 
 	// Set metadata for earliest and latest posts
-	wpl.EarlistPostTimestamp = wpl.Posts[0].CreateAt
+	wpl.EarlistPostTimestamp = wpl.RootPost().CreateAt
 	wpl.LatestPostTimestamp = wpl.Posts[wpl.NumPosts()-1].CreateAt
 
 	return wpl

@@ -63,7 +63,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: the thread is %d posts long, but the move thead command is configured to only move threads of up to %d posts", wpl.NumPosts(), config.MaxThreadCountMoveSizeInt())), true, nil
 	}
 
-	if wpl.Posts[0].ChannelId != extra.ChannelId {
+	if wpl.RootPost().ChannelId != extra.ChannelId {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the 'move thread' command must be run from the channel containing the post"), true, nil
 	}
 
@@ -80,7 +80,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
 	}
 
-	if extra.RootId == wpl.Posts[0].Id || extra.ParentId == wpl.Posts[0].Id {
+	if extra.RootId == wpl.RootPost().Id || extra.ParentId == wpl.RootPost().Id {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the 'move thread' command cannot be run from inside the thread being moved; please run directly in the channel containing the thread you wish to move"), true, nil
 	}
 
@@ -97,7 +97,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 
 	// Cleanup is handled by simply deleting the root post. Any comments/replies
 	// are automatically marked as deleted for us.
-	cleanupID := wpl.Posts[0].Id
+	cleanupID := wpl.RootPost().Id
 
 	var newRootPost *model.Post
 	var originalMessageSummary string
@@ -154,7 +154,20 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		"new_channel_id", channelID,
 	)
 
-	msg := fmt.Sprintf("A thread has been moved: %s\n", makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newRootPost.Id))
+	newPostLink := makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newRootPost.Id)
+	if extra.UserId != wpl.RootPost().UserId {
+		// The wrangled thread was not started by the user running the command.
+		// Send a DM to the user who created the root message to let them know.
+		err := p.postMoveThreadBotDM(wpl.RootPost().UserId, newPostLink)
+		if err != nil {
+			p.API.LogError("Unable to send move-thread DM to user",
+				"error", err.Error(),
+				"user_id", wpl.RootPost().UserId,
+			)
+		}
+	}
+
+	msg := fmt.Sprintf("A thread has been moved: %s\n", newPostLink)
 	msg += fmt.Sprintf(
 		"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
 		targetTeam.Name, targetChannel.Name, wpl.NumPosts(),
@@ -162,4 +175,10 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	msg += fmt.Sprintf("Original Thread Root Message:\n%s\n", quoteBlock(originalMessageSummary))
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_IN_CHANNEL, msg), false, nil
+}
+
+func (p *Plugin) postMoveThreadBotDM(userID, newPostLink string) error {
+	return p.PostBotDM(userID, fmt.Sprintf(
+		"Someone wrangled a thread you started to a new channel for you: %s", newPostLink,
+	))
 }

@@ -32,13 +32,13 @@ func TestMoveThreadCommand(t *testing.T) {
 	directChannel := &model.Channel{
 		Id:     model.NewId(),
 		TeamId: team1.Id,
-		Name:   "private-channel",
+		Name:   "direct-channel",
 		Type:   model.CHANNEL_DIRECT,
 	}
 	groupChannel := &model.Channel{
 		Id:     model.NewId(),
 		TeamId: team1.Id,
-		Name:   "private-channel",
+		Name:   "group-channel",
 		Type:   model.CHANNEL_GROUP,
 	}
 
@@ -68,6 +68,7 @@ func TestMoveThreadCommand(t *testing.T) {
 	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
 	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(generatedPosts, nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
+	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
@@ -232,6 +233,7 @@ func mockGeneratePostList(total int, channelID string, systemMessages bool) *mod
 		id := model.NewId()
 		post := &model.Post{
 			Id:        id,
+			UserId:    model.NewId(),
 			ChannelId: channelID,
 			Message:   fmt.Sprintf("This is message %d", total-i),
 			CreateAt:  time.Now().Unix(),
