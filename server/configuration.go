@@ -23,6 +23,8 @@ import (
 type configuration struct {
 	AllowedEmailDomain string
 
+	CommandAutoCompleteEnable bool
+
 	MoveThreadMaxCount                       string
 	MoveThreadToAnotherTeamEnable            bool
 	MoveThreadFromPrivateChannelEnable       bool
@@ -130,5 +132,5 @@ func (p *Plugin) OnConfigurationChange() error {
 
 	p.setConfiguration(configuration)
 
-	return nil
+	return p.API.RegisterCommand(getCommand(configuration.CommandAutoCompleteEnable))
 }

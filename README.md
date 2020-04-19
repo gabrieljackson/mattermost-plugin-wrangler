@@ -94,6 +94,7 @@ Shows version and commit information for the currently-running plugin build.
 The following plugin configuration is available:
 
  - Allowed Email Domain: an optional setting to limit plugin usage to specific users
+ - Enable Wrangler Command AutoComplete: Control whether command autocomplete is enabled or not. If enabled and Allowed Email Domain is set, then some users will be able to see the Wrangler commands, but will be unable to run them.
  - Max Thread Count Move Size: an optional setting to limit the size of threads that can be moved
  - Enable Moving Threads From Private Channels: Control whether Wrangler is permitted to move message threads from private channels or not
  - Enable Moving Threads From Direct Message Channels: Control whether Wrangler is permitted to move message threads from direct message channels or not
