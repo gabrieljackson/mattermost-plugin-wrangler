@@ -39,13 +39,13 @@ func getHelp() string {
 	))
 }
 
-func getCommand() *model.Command {
+func getCommand(autocomplete bool) *model.Command {
 	return &model.Command{
 		Trigger:          "wrangler",
 		DisplayName:      "Wrangler",
 		Description:      "Manage Mattermost messages!",
-		AutoComplete:     false,
-		AutoCompleteDesc: "Available commands: move, list, info",
+		AutoComplete:     autocomplete,
+		AutoCompleteDesc: "Available commands: move thread, attach message, list messages, list channels, info",
 		AutoCompleteHint: "[command]",
 	}
 }

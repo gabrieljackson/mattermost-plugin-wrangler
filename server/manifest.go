@@ -38,6 +38,14 @@ const manifestStr = `
         "default": null
       },
       {
+        "key": "CommandAutoCompleteEnable",
+        "display_name": "Enable Wrangler Command AutoComplete",
+        "type": "bool",
+        "help_text": "Control whether command autocomplete is enabled or not. If enabled and Allowed Email Domain is set, then some users will be able to see the Wrangler commands, but will be unable to run them.",
+        "placeholder": "",
+        "default": false
+      },
+      {
         "key": "MoveThreadMaxCount",
         "display_name": "Max Thread Count Move Size",
         "type": "text",

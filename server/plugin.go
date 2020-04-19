@@ -56,5 +56,5 @@ func (p *Plugin) OnActivate() error {
 	}
 	p.BotUserID = botID
 
-	return p.API.RegisterCommand(getCommand())
+	return p.API.RegisterCommand(getCommand(config.CommandAutoCompleteEnable))
 }
