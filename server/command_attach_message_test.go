@@ -23,10 +23,12 @@ func TestAttachMessageCommand(t *testing.T) {
 	}
 	postToBeAttached := &model.Post{
 		Id:        model.NewId(),
+		UserId:    model.NewId(),
 		ChannelId: channel1.Id,
 	}
 	postToAttachTo := &model.Post{
 		Id:        model.NewId(),
+		UserId:    model.NewId(),
 		ChannelId: channel1.Id,
 	}
 	rootID := model.NewId()
@@ -36,10 +38,21 @@ func TestAttachMessageCommand(t *testing.T) {
 		RootId:    rootID,
 		ParentId:  rootID,
 	}
-
 	postInAnotherChannel := &model.Post{
 		Id:        model.NewId(),
 		ChannelId: model.NewId(),
+	}
+	directChannel := &model.Channel{
+		Id:     model.NewId(),
+		TeamId: team1.Id,
+		Name:   "direct1",
+		Type:   model.CHANNEL_DIRECT,
+	}
+
+	config := &model.Config{
+		ServiceSettings: model.ServiceSettings{
+			SiteURL: NewString("test.sampledomain.com"),
+		},
 	}
 
 	api := &plugintest.API{}
@@ -50,7 +63,18 @@ func TestAttachMessageCommand(t *testing.T) {
 	api.On("GetPost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil, model.NewAppError("where", model.NewId(), nil, "not found", 0))
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
+	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
+	api.On("GetConfig", mock.Anything).Return(config)
 	api.On("LogInfo",
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfTypeArgument("string"),
+	).Return(nil)
+	api.On("LogError",
 		mock.AnythingOfTypeArgument("string"),
 		mock.AnythingOfTypeArgument("string"),
 		mock.AnythingOfTypeArgument("string"),

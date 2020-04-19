@@ -68,7 +68,7 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	postToBeAttached.RootId = newRootID
 	postToBeAttached.ParentId = newRootID
 
-	_, appErr = p.API.CreatePost(postToBeAttached)
+	newPost, appErr := p.API.CreatePost(postToBeAttached)
 	if appErr != nil {
 		return nil, false, errors.Wrap(appErr, "unable to create new post")
 	}
@@ -84,7 +84,25 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 		"new_root_id", newRootID,
 	)
 
+	if extra.UserId != postToBeAttached.UserId {
+		// The wrangled message was not created by the user running the command.
+		// Send a DM to the user who created it to let them know.
+		err := p.postAttachMessageBotDM(postToBeAttached.UserId, makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newPost.Id))
+		if err != nil {
+			p.API.LogError("Unable to send attach-message DM to user",
+				"error", err.Error(),
+				"user_id", postToBeAttached.UserId,
+			)
+		}
+	}
+
 	msg := fmt.Sprintf("Message successfully attached to thread")
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, msg), false, nil
+}
+
+func (p *Plugin) postAttachMessageBotDM(userID, newPostLink string) error {
+	return p.PostBotDM(userID, fmt.Sprintf(
+		"Someone wrangled one of your messages into a thread for you: %s", newPostLink,
+	))
 }
