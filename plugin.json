@@ -38,28 +38,28 @@
                 "key": "MoveThreadToAnotherTeamEnable",
                 "display_name": "Enable Moving Threads To Different Teams",
                 "type": "bool",
-                "help_text": "Control whether Wrangler is permitted to move message threads from one team to another",
+                "help_text": "Control whether Wrangler is permitted to move message threads from one team to another or not.",
                 "default": false
             },
             {
                 "key": "MoveThreadFromPrivateChannelEnable",
                 "display_name": "Enable Moving Threads From Private Channels",
                 "type": "bool",
-                "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not",
+                "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not.",
                 "default": false
             },
             {
                 "key": "MoveThreadFromDirectMessageChannelEnable",
                 "display_name": "Enable Moving Threads From Direct Message Channels",
                 "type": "bool",
-                "help_text": "Control whether Wrangler is permitted to move message threads from direct message channels or not",
+                "help_text": "Control whether Wrangler is permitted to move message threads from direct message channels or not.",
                 "default": false
             },
             {
                 "key": "MoveThreadFromGroupMessageChannelEnable",
                 "display_name": "Enable Moving Threads From Group Message Channels",
                 "type": "bool",
-                "help_text": "Control whether Wrangler is permitted to move message threads from group message channels or not",
+                "help_text": "Control whether Wrangler is permitted to move message threads from group message channels or not.",
                 "default": false
             }
         ]
