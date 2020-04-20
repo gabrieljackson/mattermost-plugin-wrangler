@@ -15,7 +15,7 @@ const manifestStr = `
   "id": "com.mattermost.wrangler",
   "name": "Wrangler",
   "description": "Manage messages across teams and channels",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "min_server_version": "5.12.0",
   "server": {
     "executables": {
@@ -57,7 +57,7 @@ const manifestStr = `
         "key": "MoveThreadToAnotherTeamEnable",
         "display_name": "Enable Moving Threads To Different Teams",
         "type": "bool",
-        "help_text": "Control whether Wrangler is permitted to move message threads from one team to another",
+        "help_text": "Control whether Wrangler is permitted to move message threads from one team to another or not.",
         "placeholder": "",
         "default": false
       },
@@ -65,7 +65,7 @@ const manifestStr = `
         "key": "MoveThreadFromPrivateChannelEnable",
         "display_name": "Enable Moving Threads From Private Channels",
         "type": "bool",
-        "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not",
+        "help_text": "Control whether Wrangler is permitted to move message threads from private channels or not.",
         "placeholder": "",
         "default": false
       },
@@ -73,7 +73,7 @@ const manifestStr = `
         "key": "MoveThreadFromDirectMessageChannelEnable",
         "display_name": "Enable Moving Threads From Direct Message Channels",
         "type": "bool",
-        "help_text": "Control whether Wrangler is permitted to move message threads from direct message channels or not",
+        "help_text": "Control whether Wrangler is permitted to move message threads from direct message channels or not.",
         "placeholder": "",
         "default": false
       },
@@ -81,7 +81,7 @@ const manifestStr = `
         "key": "MoveThreadFromGroupMessageChannelEnable",
         "display_name": "Enable Moving Threads From Group Message Channels",
         "type": "bool",
-        "help_text": "Control whether Wrangler is permitted to move message threads from group message channels or not",
+        "help_text": "Control whether Wrangler is permitted to move message threads from group message channels or not.",
         "placeholder": "",
         "default": false
       }
