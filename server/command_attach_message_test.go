@@ -115,11 +115,29 @@ func TestAttachMessageCommand(t *testing.T) {
 		assert.Contains(t, resp.Text, "Error: unable to get message with ID")
 	})
 
-	t.Run("not in channel with messages", func(t *testing.T) {
-		resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttached.Id, postToAttachTo.Id}, &model.CommandArgs{ChannelId: model.NewId()})
-		require.NoError(t, err)
-		assert.True(t, isUserError)
-		assert.Contains(t, resp.Text, "Error: the attach command must be run from the channel containing the messages")
+	t.Run("invalid command run location", func(t *testing.T) {
+		t.Run("not in channel with messages", func(t *testing.T) {
+			resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttached.Id, postToAttachTo.Id}, &model.CommandArgs{ChannelId: model.NewId()})
+			require.NoError(t, err)
+			assert.True(t, isUserError)
+			assert.Contains(t, resp.Text, "Error: the attach command must be run from the channel containing the messages")
+		})
+
+		t.Run("in thread with message to be attached", func(t *testing.T) {
+			t.Run("parentId matches", func(t *testing.T) {
+				resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttached.Id, postToAttachTo.Id}, &model.CommandArgs{ChannelId: channel1.Id, ParentId: postToBeAttached.Id})
+				require.NoError(t, err)
+				assert.True(t, isUserError)
+				assert.Contains(t, resp.Text, "Error: the 'attach message' command cannot be run from inside the thread of the message being attached; please run directly in the channel containing the message you wish to attach")
+			})
+
+			t.Run("rootId matches", func(t *testing.T) {
+				resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttached.Id, postToAttachTo.Id}, &model.CommandArgs{ChannelId: channel1.Id, RootId: postToBeAttached.Id})
+				require.NoError(t, err)
+				assert.True(t, isUserError)
+				assert.Contains(t, resp.Text, "Error: the 'attach message' command cannot be run from inside the thread of the message being attached; please run directly in the channel containing the message you wish to attach")
+			})
+		})
 	})
 
 	t.Run("attach to message in another channel", func(t *testing.T) {
