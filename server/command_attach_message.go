@@ -43,6 +43,9 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	if len(postToBeAttached.RootId) != 0 || len(postToBeAttached.ParentId) != 0 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the message to be attached is already part of a thread"), true, nil
 	}
+	if extra.RootId == postToBeAttached.Id || extra.ParentId == postToBeAttached.Id {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the 'attach message' command cannot be run from inside the thread of the message being attached; please run directly in the channel containing the message you wish to attach"), true, nil
+	}
 
 	// We now know:
 	// 1. The post IDs are valid.
