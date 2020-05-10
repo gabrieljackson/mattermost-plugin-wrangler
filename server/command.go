@@ -61,17 +61,8 @@ func getCommandResponse(responseType, text string) *model.CommandResponse {
 
 // ExecuteCommand executes a given command and returns a command response.
 func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
-	config := p.getConfiguration()
-
-	if config.AllowedEmailDomain != "" {
-		user, err := p.API.GetUser(args.UserId)
-		if err != nil {
-			return nil, err
-		}
-
-		if !strings.HasSuffix(user.Email, config.AllowedEmailDomain) {
-			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Permission denied. Please talk to your system administrator to get access."), nil
-		}
+	if !p.authorizedPluginUser(args.UserId) {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Permission denied. Please talk to your system administrator to get access."), nil
 	}
 
 	stringArgs := strings.Split(args.Command, " ")
@@ -147,4 +138,21 @@ func (p *Plugin) runInfoCommand(args []string, extra *model.CommandArgs) (*model
 		manifest.Version, BuildHashShort, BuildHash, BuildDate)
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, resp), false, nil
+}
+
+func (p *Plugin) authorizedPluginUser(userID string) bool {
+	config := p.getConfiguration()
+
+	if len(config.AllowedEmailDomain) != 0 {
+		user, err := p.API.GetUser(userID)
+		if err != nil {
+			return false
+		}
+
+		if !strings.HasSuffix(user.Email, config.AllowedEmailDomain) {
+			return false
+		}
+	}
+
+	return true
 }
