@@ -109,6 +109,40 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		"original_channel_id", originalChannel.Id,
 	)
 
+	if wpl.ContainsFileAttachments() {
+		// The thread contains at least one attachment. To properly move the
+		// thread, the files will have to be re-uploaded. This is completed
+		// before any messages are moved.
+		// TODO: check number of files that need to be re-uploaded or file size?
+		p.API.LogInfo("Wrangler is re-uploading file attachments",
+			"file_count", wpl.FileAttachmentCount,
+		)
+
+		for _, post := range wpl.Posts {
+			var newFileIDs []string
+			var fileBytes []byte
+			var oldFileInfo, newFileInfo *model.FileInfo
+			for _, fileID := range post.FileIds {
+				oldFileInfo, appErr = p.API.GetFileInfo(fileID)
+				if appErr != nil {
+					return nil, false, errors.Wrap(appErr, "unable to lookup file info to re-upload")
+				}
+				fileBytes, appErr = p.API.GetFile(fileID)
+				if appErr != nil {
+					return nil, false, errors.Wrap(appErr, "unable to get file bytes to re-upload")
+				}
+				newFileInfo, appErr = p.API.UploadFile(fileBytes, targetChannel.Id, oldFileInfo.Name)
+				if appErr != nil {
+					return nil, false, errors.Wrap(appErr, "unable to re-upload file")
+				}
+
+				newFileIDs = append(newFileIDs, newFileInfo.Id)
+			}
+
+			post.FileIds = newFileIDs
+		}
+	}
+
 	for i, post := range wpl.Posts {
 		if i == 0 {
 			cleanPost(post)
