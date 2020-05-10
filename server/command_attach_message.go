@@ -67,7 +67,7 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 		"new_root_id", newRootID,
 	)
 
-	cleanPost(postToBeAttached)
+	cleanPostID(postToBeAttached)
 	postToBeAttached.RootId = newRootID
 	postToBeAttached.ParentId = newRootID
 

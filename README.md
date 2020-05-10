@@ -111,3 +111,6 @@ A: That isn't a question, but I hear you. It's actively in the works.
 
 Q: It would be awesome if Wrangler could do this other thing! Is that coming any time soon?
 A: Please open a GitHub issue and I would be happy to see if we can implement it.
+
+Q: When I run `/wranger attach message` it seems like the attached message is out of order?
+A: When attaching a message, it's necessary to create a new post in the thread which triggers the default behavior of Mattermost to show the message at the bottom of the channel. The message has been attached to the thread with the correct timestamp of when it was originally posted though, so simply reloading the channel will resolve the out-of-order behavior you are initially experiencing. This is also something I would like to improve in the future if possible. (Note that this behavior was changed for Wrangler after v0.3.0 was cut)
