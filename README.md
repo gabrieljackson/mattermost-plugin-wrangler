@@ -100,3 +100,14 @@ The following plugin configuration is available:
  - Enable Moving Threads From Private Channels: Control whether Wrangler is permitted to move message threads from private channels or not.
  - Enable Moving Threads From Direct Message Channels: Control whether Wrangler is permitted to move message threads from direct message channels or not.
  - Enable Moving Threads From Group Message Channels: Control whether Wrangler is permitted to move message threads from group message channels or not.
+
+## FAQ
+
+Q: If I move a thread to a new channel, can I expect that every message will be identical to the original?
+A: Currently, posts will be moved with their original message content. That said, due to technical challenges both emoji reactions and file attachments are currently unable to be properly moved to the new posts. This is something I hope to address soon.
+
+Q: I would very much like some UI please.
+A: That isn't a question, but I hear you. It's actively in the works.
+
+Q: It would be awesome if Wrangler could do this other thing! Is that coming any time soon?
+A: Please open a GitHub issue and I would be happy to see if we can implement it.
