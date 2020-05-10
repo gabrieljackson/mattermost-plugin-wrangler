@@ -145,11 +145,11 @@ func applyManifest(manifest *model.Manifest) error {
 
 		// write generated code to file by using JS file template.
 		if err := ioutil.WriteFile(
-			"webapp/src/manifest.js",
+			"webapp/src/manifest.ts",
 			[]byte(fmt.Sprintf(pluginIDJSFileTemplate, manifestStr)),
 			0644,
 		); err != nil {
-			return errors.Wrap(err, "failed to open webapp/src/manifest.js")
+			return errors.Wrap(err, "failed to open webapp/src/manifest.ts")
 		}
 	}
 

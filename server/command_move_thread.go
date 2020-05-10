@@ -76,7 +76,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	if appErr != nil {
 		return nil, false, fmt.Errorf("unable to get channel with ID %s", channelID)
 	}
-	if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != extra.TeamId {
+	if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != originalChannel.TeamId {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
 	}
 

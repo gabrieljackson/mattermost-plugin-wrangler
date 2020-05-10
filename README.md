@@ -107,7 +107,7 @@ Q: If I move a thread to a new channel, can I expect that every message will be 
 A: Currently, posts will be moved with their original message content. That said, due to technical challenges both emoji reactions and file attachments are currently unable to be properly moved to the new posts. This is something I hope to address soon.
 
 Q: I would very much like some UI please.
-A: That isn't a question, but I hear you. It's actively in the works.
+A: That isn't a question, but I hear you. The initial UI for `move thread` can be enabled in plugin settings and more is on the way.
 
 Q: It would be awesome if Wrangler could do this other thing! Is that coming any time soon?
 A: Please open a GitHub issue and I would be happy to see if we can implement it.

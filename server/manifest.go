@@ -25,6 +25,9 @@ const manifestStr = `
     },
     "executable": ""
   },
+  "webapp": {
+    "bundle_path": "webapp/dist/main.js"
+  },
   "settings_schema": {
     "header": "",
     "footer": "",
@@ -36,6 +39,14 @@ const manifestStr = `
         "help_text": "(Optional) When set, users must have an email ending in this domain to use the wrangler slash command.",
         "placeholder": "",
         "default": null
+      },
+      {
+        "key": "EnableWebUI",
+        "display_name": "Enable Wrangler webapp functionality [ALPHA]",
+        "type": "bool",
+        "help_text": "Enable the work-in-progress Wrangler webapp functionality.",
+        "placeholder": "",
+        "default": false
       },
       {
         "key": "CommandAutoCompleteEnable",
