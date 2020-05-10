@@ -71,6 +71,35 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	postToBeAttached.RootId = newRootID
 	postToBeAttached.ParentId = newRootID
 
+	if len(postToBeAttached.FileIds) != 0 {
+		// TODO: check number of files that need to be re-uploaded or file size?
+		p.API.LogInfo("Wrangler is re-uploading file attachments",
+			"file_count", len(postToBeAttached.FileIds),
+		)
+
+		var newFileIDs []string
+		var fileBytes []byte
+		var oldFileInfo, newFileInfo *model.FileInfo
+		for _, fileID := range postToBeAttached.FileIds {
+			oldFileInfo, appErr = p.API.GetFileInfo(fileID)
+			if appErr != nil {
+				return nil, false, errors.Wrap(appErr, "unable to lookup file info to re-upload")
+			}
+			fileBytes, appErr = p.API.GetFile(fileID)
+			if appErr != nil {
+				return nil, false, errors.Wrap(appErr, "unable to get file bytes to re-upload")
+			}
+			newFileInfo, appErr = p.API.UploadFile(fileBytes, postToBeAttached.ChannelId, oldFileInfo.Name)
+			if appErr != nil {
+				return nil, false, errors.Wrap(appErr, "unable to re-upload file")
+			}
+
+			newFileIDs = append(newFileIDs, newFileInfo.Id)
+		}
+
+		postToBeAttached.FileIds = newFileIDs
+	}
+
 	newPost, appErr := p.API.CreatePost(postToBeAttached)
 	if appErr != nil {
 		return nil, false, errors.Wrap(appErr, "unable to create new post")

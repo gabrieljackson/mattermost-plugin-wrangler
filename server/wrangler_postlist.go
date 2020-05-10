@@ -11,7 +11,7 @@ type WranglerPostList struct {
 	ThreadUserIDs        []string
 	EarlistPostTimestamp int64
 	LatestPostTimestamp  int64
-	ContainsAttachments  bool
+	FileAttachmentCount  int64
 }
 
 // NumPosts returns the number of posts in a post list.
@@ -26,6 +26,11 @@ func (wpl *WranglerPostList) RootPost() *model.Post {
 	}
 
 	return wpl.Posts[0]
+}
+
+// ContainsFileAttachments returns if the post list contains any file attachments.
+func (wpl *WranglerPostList) ContainsFileAttachments() bool {
+	return wpl.FileAttachmentCount != 0
 }
 
 func buildWranglerPostList(postList *model.PostList) *WranglerPostList {
@@ -52,10 +57,7 @@ func buildWranglerPostList(postList *model.PostList) *WranglerPostList {
 			wpl.ThreadUserIDs = append(wpl.ThreadUserIDs, p.UserId)
 		}
 
-		// Mark postlist as containing attachments if post has attachment(s).
-		if !wpl.ContainsAttachments && len(p.Attachments()) != 0 {
-			wpl.ContainsAttachments = true
-		}
+		wpl.FileAttachmentCount += int64(len(p.FileIds))
 
 		wpl.Posts = append(wpl.Posts, p)
 	}
