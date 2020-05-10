@@ -62,11 +62,16 @@ func (p *Plugin) handleRouteAPISettings(w http.ResponseWriter, r *http.Request) 
 		return respondErr(w, http.StatusUnauthorized, errors.New("not authorized"))
 	}
 
+	var enabled bool
+	if p.getConfiguration().EnableWebUI && p.authorizedPluginUser(mattermostUserID) {
+		enabled = true
+	}
+
 	return respondJSON(w,
 		struct {
 			EnableWebUI bool `json:"enable_web_ui"`
 		}{
-			EnableWebUI: p.getConfiguration().EnableWebUI,
+			EnableWebUI: enabled,
 		},
 	)
 }
