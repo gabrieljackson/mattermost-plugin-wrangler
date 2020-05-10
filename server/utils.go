@@ -20,6 +20,10 @@ func cleanPost(post *model.Post) {
 	post.EditAt = 0
 }
 
+func cleanPostID(post *model.Post) {
+	post.Id = ""
+}
+
 func cleanAndTrimMessage(message string, trimLength int) string {
 	return trimMessage(cleanMessage(message), trimLength)
 }
