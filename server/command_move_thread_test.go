@@ -52,6 +52,13 @@ func TestMoveThreadCommand(t *testing.T) {
 		Name:   "target-channel",
 	}
 
+	reactions := []*model.Reaction{
+		{
+			UserId: model.NewId(),
+			PostId: model.NewId(),
+		},
+	}
+
 	config := &model.Config{
 		ServiceSettings: model.ServiceSettings{
 			SiteURL: NewString("test.sampledomain.com"),
@@ -72,6 +79,8 @@ func TestMoveThreadCommand(t *testing.T) {
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
+	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
+	api.On("AddReaction", mock.Anything).Return(nil, nil)
 	api.On("GetConfig", mock.Anything).Return(config)
 	api.On("LogInfo",
 		mock.AnythingOfTypeArgument("string"),

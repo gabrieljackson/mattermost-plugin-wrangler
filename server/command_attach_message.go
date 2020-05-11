@@ -67,10 +67,6 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 		"new_root_id", newRootID,
 	)
 
-	cleanPostID(postToBeAttached)
-	postToBeAttached.RootId = newRootID
-	postToBeAttached.ParentId = newRootID
-
 	if len(postToBeAttached.FileIds) != 0 {
 		// TODO: check number of files that need to be re-uploaded or file size?
 		p.API.LogInfo("Wrangler is re-uploading file attachments",
@@ -100,9 +96,27 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 		postToBeAttached.FileIds = newFileIDs
 	}
 
+	// Store reactions to be reapplied later.
+	reactions, appErr := p.API.GetReactions(postToBeAttached.Id)
+	if appErr != nil {
+		return nil, false, errors.Wrap(appErr, "failed to get reactions on original post")
+	}
+
+	cleanPostID(postToBeAttached)
+	postToBeAttached.RootId = newRootID
+	postToBeAttached.ParentId = newRootID
+
 	newPost, appErr := p.API.CreatePost(postToBeAttached)
 	if appErr != nil {
-		return nil, false, errors.Wrap(appErr, "unable to create new post")
+		return nil, false, errors.Wrap(appErr, "failed to create new post")
+	}
+
+	for _, reaction := range reactions {
+		reaction.PostId = newPost.Id
+		_, appErr = p.API.AddReaction(reaction)
+		if appErr != nil {
+			p.API.LogError("Failed to reapply reactions to moved post", "err", appErr)
+		}
 	}
 
 	appErr = p.API.DeletePost(cleanupID)
