@@ -99,7 +99,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	// are automatically marked as deleted for us.
 	cleanupID := wpl.RootPost().Id
 
-	var newRootPost *model.Post
+	var newRootPostID string
 	var originalMessageSummary string
 
 	// Begin creating the new thread.
@@ -144,32 +144,51 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	}
 
 	for i, post := range wpl.Posts {
-		if i == 0 {
-			cleanPost(post)
-			post.ChannelId = channelID
-			newRootPost, appErr = p.API.CreatePost(post)
-			if appErr != nil {
-				return nil, false, errors.Wrap(appErr, "unable to create new root post")
-			}
-			originalMessageSummary = cleanAndTrimMessage(post.Message, 500)
+		var newPost *model.Post
+		var reactions []*model.Reaction
 
-			continue
+		// Store reactions to be reapplied later.
+		reactions, appErr = p.API.GetReactions(post.Id)
+		if appErr != nil {
+			// Reaction-based errors are logged, but do not cause the plugin to
+			// abort the move thread process.
+			p.API.LogError("Failed to get reactions on original post", "err", appErr)
 		}
 
 		cleanPost(post)
 		post.ChannelId = channelID
-		post.RootId = newRootPost.Id
-		post.ParentId = newRootPost.Id
-		_, appErr = p.API.CreatePost(post)
-		if appErr != nil {
-			return nil, false, errors.Wrap(appErr, "unable to create new post")
+
+		if i == 0 {
+			newPost, appErr = p.API.CreatePost(post)
+			if appErr != nil {
+				return nil, false, errors.Wrap(appErr, "unable to create new root post")
+			}
+			newRootPostID = newPost.Id
+			originalMessageSummary = cleanAndTrimMessage(post.Message, 500)
+		} else {
+			post.RootId = newRootPostID
+			post.ParentId = newRootPostID
+			newPost, appErr = p.API.CreatePost(post)
+			if appErr != nil {
+				return nil, false, errors.Wrap(appErr, "unable to create new post")
+			}
+		}
+
+		for _, reaction := range reactions {
+			reaction.PostId = newPost.Id
+			_, appErr = p.API.AddReaction(reaction)
+			if appErr != nil {
+				// Reaction-based errors are logged, but do not cause the plugin to
+				// abort the move thread process.
+				p.API.LogError("Failed to reapply reactions to moved post", "err", appErr)
+			}
 		}
 	}
 
 	_, appErr = p.API.CreatePost(&model.Post{
 		UserId:    p.BotUserID,
-		RootId:    newRootPost.Id,
-		ParentId:  newRootPost.Id,
+		RootId:    newRootPostID,
+		ParentId:  newRootPostID,
 		ChannelId: channelID,
 		Message:   "This thread was moved from another channel",
 	})
@@ -184,11 +203,11 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 
 	p.API.LogInfo("Wrangler thread move complete",
 		"user_id", extra.UserId,
-		"new_post_id", newRootPost.Id,
+		"new_post_id", newRootPostID,
 		"new_channel_id", channelID,
 	)
 
-	newPostLink := makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newRootPost.Id)
+	newPostLink := makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newRootPostID)
 	if extra.UserId != wpl.RootPost().UserId {
 		// The wrangled thread was not started by the user running the command.
 		// Send a DM to the user who created the root message to let them know.

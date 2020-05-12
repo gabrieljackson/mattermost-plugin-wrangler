@@ -49,6 +49,13 @@ func TestAttachMessageCommand(t *testing.T) {
 		Type:   model.CHANNEL_DIRECT,
 	}
 
+	reactions := []*model.Reaction{
+		{
+			UserId: model.NewId(),
+			PostId: model.NewId(),
+		},
+	}
+
 	config := &model.Config{
 		ServiceSettings: model.ServiceSettings{
 			SiteURL: NewString("test.sampledomain.com"),
@@ -64,6 +71,8 @@ func TestAttachMessageCommand(t *testing.T) {
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
 	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
+	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
+	api.On("AddReaction", mock.Anything).Return(nil, nil)
 	api.On("GetConfig", mock.Anything).Return(config)
 	api.On("LogInfo",
 		mock.AnythingOfTypeArgument("string"),
