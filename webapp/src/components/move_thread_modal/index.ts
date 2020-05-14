@@ -2,9 +2,11 @@ import {connect} from 'react-redux';
 import {Dispatch, Action, bindActionCreators} from 'redux';
 
 import {GlobalState} from 'mattermost-redux/types/store';
+import {getTeam, getTeamMemberships} from 'mattermost-redux/selectors/entities/teams';
+import {Team} from 'mattermost-redux/types/teams';
 import {getPost} from 'mattermost-redux/selectors/entities/posts';
 
-import {isMoveModalVisable, getMoveThreadPostID, getChannelsForTeamSel} from '../../selectors';
+import {isMoveModalVisable, getMoveThreadPostID} from '../../selectors';
 import {closeMoveThreadModal, moveThread, getChannelsForTeam} from '../../actions';
 
 import MoveThreadModal from './move_thread_modal';
@@ -12,7 +14,6 @@ import MoveThreadModal from './move_thread_modal';
 function mapStateToProps(state: GlobalState) {
     let postID = getMoveThreadPostID(state);
     let post = getPost(state, postID);
-    const channels = getChannelsForTeamSel(state);
     let message = '';
 
     if (post) {
@@ -24,11 +25,22 @@ function mapStateToProps(state: GlobalState) {
         message = post.message;
     }
 
+    const getMyTeamsFunc = () => {
+        const myTeamMemberships = getTeamMemberships(state);
+        const myTeams = Array<Team>();
+        Object.keys(myTeamMemberships).forEach((id) => {
+            const team = getTeam(state, id);
+            myTeams.push(team);
+        });
+
+        return myTeams;
+    };
+
     return {
         visible: isMoveModalVisable(state),
+        getMyTeams: getMyTeamsFunc,
         postID,
         message,
-        channelsForTeam: channels,
         state,
     };
 }
