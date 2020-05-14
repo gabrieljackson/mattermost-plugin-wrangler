@@ -1,23 +1,19 @@
 import React from 'react';
 
 import {Modal} from 'react-bootstrap';
-
-import {getTeam, getTeamMemberships} from 'mattermost-redux/selectors/entities/teams';
-import {Team} from 'mattermost-redux/types/teams';
-import {Channel} from 'mattermost-redux/types/channels';
 import Form from 'react-bootstrap/Form';
 
-import {GlobalState} from 'mattermost-redux/types/store';
+import {Team} from 'mattermost-redux/types/teams';
+import {Channel} from 'mattermost-redux/types/channels';
 
 interface Props {
     visible: boolean;
     postID: string;
     message: string;
     moveThread: Function;
+    getMyTeams: Function;
     getChannelsForTeam: Function;
     closeMoveThreadModal: Function;
-    channelsForTeam: Array<Channel>;
-    state: GlobalState;
 }
 
 type State = {
@@ -40,14 +36,28 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
     }
 
     private loadTeams = async () => {
-        const myTeamMemberships = getTeamMemberships(this.props.state);
-        const myTeams = Array<Team>();
-        Object.keys(myTeamMemberships).forEach((id) => {
-            const team = getTeam(this.props.state, id);
-            myTeams.push(team);
-        });
+        const myTeams = this.props.getMyTeams();
 
-        this.setState({allTeams: myTeams});
+        let firstTeamID = '';
+        let firstChannelID = '';
+        let channels = Array<Channel>();
+        if (myTeams.length > 0) {
+            const firstTeam = myTeams[0];
+            firstTeamID = firstTeam.id;
+            const channelResponse = await this.props.getChannelsForTeam(firstTeamID);
+            channels = channelResponse.data;
+            if (channels.length > 0) {
+                const firstChannel = channels[0];
+                firstChannelID = firstChannel.id;
+            }
+        }
+
+        this.setState({
+            allTeams: myTeams,
+            channelsInTeam: channels,
+            selectedTeam: firstTeamID,
+            selectedChannel: firstChannelID,
+        });
     }
 
     componentDidMount() {
@@ -56,9 +66,19 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
 
     private handleTeamSelectChange = async (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const teamID = event.target.value;
-        const channels = await this.props.getChannelsForTeam(teamID);
+        const channelResponse = await this.props.getChannelsForTeam(teamID);
+        const channels = channelResponse.data;
+        let firstChannelID = '';
+        if (channels.length > 0) {
+            const firstChannel = channels[0];
+            firstChannelID = firstChannel.id;
+        }
 
-        this.setState({selectedTeam: teamID, channelsInTeam: channels.data});
+        this.setState({
+            selectedTeam: teamID,
+            selectedChannel: firstChannelID,
+            channelsInTeam: channels,
+        });
     }
 
     private handleChannelSelectChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
@@ -100,30 +120,22 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                 onExited={this.handleClose}
                 bsSize='large'
                 backdrop='static'
+                centered={true}
             >
                 <Modal.Header closeButton={true}>
                     <Modal.Title>
-                        {'Wrangler - Move Message to Another Thread'}
+                        {'Wrangler - Move Thread to Another Channel'}
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body
-                    ref='modalBody'
-                >
+                <Modal.Body>
                     <Form>
-                        <Form.Group controlId='exampleForm.ControlSelect1'>
+                        <Form.Group>
                             <Form.Label>{'Team'}</Form.Label>
                             <Form.Control
-                                defaultValue='Select a Team'
                                 as='select'
                                 onChange={this.handleTeamSelectChange}
+                                value={this.state.selectedTeam}
                             >
-                                <option
-                                    id='team-select'
-                                    value='Select a Team'
-                                    disabled={true}
-                                >
-                                    {'Select a Team'}
-                                </option>
                                 {this.state.allTeams.map((team) => (
                                     <option
                                         key={team.id}
@@ -135,21 +147,14 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                                 ))}
                             </Form.Control>
                         </Form.Group>
-                        <Form.Group controlId='exampleForm.ControlSelect2'>
+                        <Form.Group>
                             <Form.Label>{'Channel'}</Form.Label>
                             <Form.Control
-                                defaultValue='Select a Channel'
-                                disabled={this.state.selectedTeam === ''}
                                 as='select'
                                 onChange={this.handleChannelSelectChange}
+                                value={this.state.selectedChannel}
+                                disabled={this.state.selectedTeam === ''}
                             >
-                                <option
-                                    id='channel-select'
-                                    value='Select a Channel'
-                                    disabled={true}
-                                >
-                                    {'Select a Channel'}
-                                </option>
                                 {this.state.channelsInTeam.map((channel) => (
                                     <option
                                         key={channel.id}
@@ -161,7 +166,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                                 ))}
                             </Form.Control>
                         </Form.Group>
-                        <Form.Group controlId='exampleForm.ControlTextarea1'>
+                        <Form.Group>
                             <Form.Label>{'Thread Root Message'}</Form.Label>
                             <textarea
                                 style={style}
