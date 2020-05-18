@@ -15,12 +15,25 @@ interface Props {
 }
 
 function mapStateToProps(state: GlobalState, props: Props) {
-    const post = getPost(state, props.postId);
+    let post = getPost(state, props.postId);
     const oldSystemMessageOrNull = post ? isSystemMessage(post) : true;
     const systemMessage = isCombinedUserActivityPost(post) || oldSystemMessageOrNull;
 
+    let threadCount = 1;
+    if (post) {
+        if (post.root_id) {
+            post = getPost(state, post.root_id);
+        }
+
+        const postsInThread = state.entities.posts.postsInThread[post.id];
+        if (postsInThread) {
+            threadCount = postsInThread.length + 1;
+        }
+    }
+
     return {
         postId: props.postId,
+        threadCount,
         isSystemMessage: systemMessage,
     };
 }
