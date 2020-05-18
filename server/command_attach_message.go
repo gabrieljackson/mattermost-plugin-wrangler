@@ -25,6 +25,10 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	postToBeAttachedID := args[0]
 	postToAttachToID := args[1]
 
+	if postToBeAttachedID == postToAttachToID {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the two provided message IDs should not be the same"), true, nil
+	}
+
 	postToBeAttached, appErr := p.API.GetPost(postToBeAttachedID)
 	if appErr != nil {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: unable to get message with ID %s; ensure this is correct", postToBeAttachedID)), true, nil
@@ -48,7 +52,7 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	}
 
 	// We now know:
-	// 1. The post IDs are valid.
+	// 1. The post IDs are valid and unique.
 	// 2. The post to be attached is not part of a thread already.
 	// 3. The posts are in the same channel.
 	// 4. The command was run from the original channel with the posts, so they
