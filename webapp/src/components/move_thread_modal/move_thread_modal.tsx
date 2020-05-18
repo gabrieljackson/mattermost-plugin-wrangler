@@ -10,6 +10,7 @@ interface Props {
     visible: boolean;
     postID: string;
     message: string;
+    threadCount: number;
     moveThread: Function;
     getMyTeams: Function;
     getChannelsForTeam: Function;
@@ -21,6 +22,7 @@ type State = {
     channelsInTeam: Array<Channel>;
     selectedTeam: string;
     selectedChannel: string;
+    moveThreadButtonText: string;
 }
 
 export default class MoveThreadModal extends React.PureComponent<Props, State> {
@@ -32,7 +34,18 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             channelsInTeam: Array<Channel>(),
             selectedTeam: '',
             selectedChannel: '',
+            moveThreadButtonText: this.getMoveButtonText(),
         };
+    }
+
+    componentDidMount() {
+        this.loadTeams();
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.threadCount !== this.props.threadCount) {
+            this.setButtonState();
+        }
     }
 
     private loadTeams = async () => {
@@ -58,10 +71,6 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             selectedTeam: firstTeamID,
             selectedChannel: firstChannelID,
         });
-    }
-
-    componentDidMount() {
-        this.loadTeams();
     }
 
     private handleTeamSelectChange = async (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
@@ -102,15 +111,38 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         this.props.closeMoveThreadModal();
     };
 
+    private setButtonState() {
+        this.setState({moveThreadButtonText: this.getMoveButtonText()});
+    }
+
+    private getMoveButtonText() {
+        if (this.props.threadCount === 1) {
+            return 'Move Message';
+        }
+
+        return 'Move Thread';
+    }
+
+    private handleButtonOnMouseEnter() {
+        this.setState({moveThreadButtonText: 'Yeehaw!'});
+    }
+
+    private handleButtonOnMouseLeave() {
+        this.setState({moveThreadButtonText: this.getMoveButtonText()});
+    }
+
     public render() {
         let disabled = false;
         if (this.props.postID === '' || this.state.selectedChannel === '') {
             disabled = true;
         }
 
-        const style = {
-            resize: 'none',
-        };
+        let moveMessage = 'Move this message?';
+        let title = 'Wrangler - Move Message to Another Channel';
+        if (this.props.threadCount > 1) {
+            title = 'Wrangler - Move Thread to Another Channel';
+            moveMessage = 'Move this thread of ' + this.props.threadCount + ' messages?';
+        }
 
         return (
             <Modal
@@ -124,7 +156,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             >
                 <Modal.Header closeButton={true}>
                     <Modal.Title>
-                        {'Wrangler - Move Thread to Another Channel'}
+                        {title}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -169,7 +201,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                         <Form.Group>
                             <Form.Label>{'Thread Root Message'}</Form.Label>
                             <textarea
-                                style={style}
+                                style={{resize: 'none'}}
                                 className='form-control'
                                 rows={5}
                                 value={this.props.message}
@@ -178,6 +210,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                             />
                         </Form.Group>
                     </Form>
+                    <p><span className='pull-right'>{moveMessage}</span></p>
                 </Modal.Body>
                 <Modal.Footer>
                     <button
@@ -190,10 +223,13 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                     <button
                         id='saveSetting'
                         className='btn btn-primary'
+                        style={{width: '115px'}}
                         onClick={this.handleOnClick}
+                        onMouseEnter={this.handleButtonOnMouseEnter.bind(this)}
+                        onMouseLeave={this.handleButtonOnMouseLeave.bind(this)}
                         disabled={disabled}
                     >
-                        {'Move Thread'}
+                        {this.state.moveThreadButtonText}
                     </button>
                 </Modal.Footer>
             </Modal>

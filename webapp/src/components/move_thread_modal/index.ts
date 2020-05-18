@@ -15,6 +15,7 @@ function mapStateToProps(state: GlobalState) {
     let postID = getMoveThreadPostID(state);
     let post = getPost(state, postID);
     let message = '';
+    let threadCount = 1;
 
     if (post) {
         if (post.root_id) {
@@ -23,6 +24,11 @@ function mapStateToProps(state: GlobalState) {
 
         postID = post.id;
         message = post.message;
+
+        const postsInThread = state.entities.posts.postsInThread[postID];
+        if (postsInThread) {
+            threadCount = postsInThread.length + 1;
+        }
     }
 
     const getMyTeamsFunc = () => {
@@ -41,7 +47,7 @@ function mapStateToProps(state: GlobalState) {
         getMyTeams: getMyTeamsFunc,
         postID,
         message,
-        state,
+        threadCount,
     };
 }
 

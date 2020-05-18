@@ -5,6 +5,7 @@ import {faHatCowboy} from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
     postId: string;
+    threadCount: number;
     isSystemMessage: boolean;
     openMoveThreadModal: Function;
 }
@@ -25,6 +26,11 @@ export default class MoveThreadDropdown extends React.PureComponent<Props, State
             return null;
         }
 
+        let content = 'Move Message';
+        if (this.props.threadCount > 1) {
+            content = 'Move Thread';
+        }
+
         return (
             <React.Fragment>
                 <li
@@ -40,7 +46,7 @@ export default class MoveThreadDropdown extends React.PureComponent<Props, State
                             className='MenuItem__icon'
                             icon={faHatCowboy}
                         />
-                        {'Wrangler - Move Thread'}
+                        {content}
                     </button>
                 </li>
             </React.Fragment>
