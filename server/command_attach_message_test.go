@@ -110,6 +110,13 @@ func TestAttachMessageCommand(t *testing.T) {
 		assert.Contains(t, resp.Text, "Error: missing arguments")
 	})
 
+	t.Run("post IDs are the same", func(t *testing.T) {
+		resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToAttachTo.Id, postToAttachTo.Id}, &model.CommandArgs{ChannelId: model.NewId()})
+		require.NoError(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, resp.Text, "Error: the two provided message IDs should not be the same")
+	})
+
 	t.Run("post to be attached invalid", func(t *testing.T) {
 		resp, isUserError, err := plugin.runAttachMessageCommand([]string{model.NewId(), postToAttachTo.Id}, &model.CommandArgs{ChannelId: model.NewId()})
 		require.NoError(t, err)
