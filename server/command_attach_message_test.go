@@ -48,6 +48,10 @@ func TestAttachMessageCommand(t *testing.T) {
 		Name:   "direct1",
 		Type:   model.CHANNEL_DIRECT,
 	}
+	currentTeam := &model.Team{
+		Id:   model.NewId(),
+		Name: "target-team",
+	}
 
 	reactions := []*model.Reaction{
 		{
@@ -73,6 +77,7 @@ func TestAttachMessageCommand(t *testing.T) {
 	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
 	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
 	api.On("AddReaction", mock.Anything).Return(nil, nil)
+	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(currentTeam, nil)
 	api.On("GetConfig", mock.Anything).Return(config)
 	api.On("LogInfo",
 		mock.AnythingOfTypeArgument("string"),

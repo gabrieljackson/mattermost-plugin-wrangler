@@ -207,7 +207,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		"new_channel_id", channelID,
 	)
 
-	newPostLink := makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newRootPostID)
+	newPostLink := makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, targetTeam.Name, newRootPostID)
 	if extra.UserId != wpl.RootPost().UserId {
 		// The wrangled thread was not started by the user running the command.
 		// Send a DM to the user who created the root message to let them know.
