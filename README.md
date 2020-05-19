@@ -8,9 +8,12 @@ A [Mattermost](https://mattermost.com) plugin for managing messages.
 
 ## About
 
-The wrangler plugin was created to provide advanced message management options. Currently, it supports moving messages, and any thread they may belong to, across channels and teams. The primary use-case for this is to expose a conversation to a more-appropriate channel for even greater participation.
+The wrangler plugin was created to provide advanced message management options. Currently, it supports two primary functions:
 
-In the future, the wrangler plugin will be developed to support additional tasks such as moving messages to new threads. Additionally, web UI integration will be supported for easier use and non-message tasks could even be implemented.
+ 1. Move threads between channels.
+ 2. Attach non-threaded messages to a thread.
+
+Both of these functions are designed to quickly bring messages to a place they likely have more relevance in. Example uses include moving a question to a channel where users have direct expertise or to attach a single message to a thread that it obviously was related to.
 
 ## Install
 
@@ -100,17 +103,22 @@ The following plugin configuration is available:
  - Enable Moving Threads From Private Channels: Control whether Wrangler is permitted to move message threads from private channels or not.
  - Enable Moving Threads From Direct Message Channels: Control whether Wrangler is permitted to move message threads from direct message channels or not.
  - Enable Moving Threads From Group Message Channels: Control whether Wrangler is permitted to move message threads from group message channels or not.
+ - Enable Wrangler webapp functionality: Enable the work-in-progress Wrangler webapp functionality.
 
 ## FAQ
 
-Q: If I move a thread to a new channel, can I expect that every message will be identical to the original?
-A: Currently, posts will be moved with their original message content. That said, due to technical challenges both emoji reactions and file attachments are currently unable to be properly moved to the new posts. This is something I hope to address soon.
-
 Q: I would very much like some UI please.
+
 A: That isn't a question, but I hear you. The initial UI for `move thread` can be enabled in plugin settings and more is on the way.
 
+---
+
 Q: It would be awesome if Wrangler could do this other thing! Is that coming any time soon?
+
 A: Please open a GitHub issue and I would be happy to see if we can implement it.
 
+---
+
 Q: When I run `/wranger attach message` it seems like the attached message is out of order?
+
 A: When attaching a message, it's necessary to create a new post in the thread which triggers the default behavior of Mattermost to show the message at the bottom of the channel. The message has been attached to the thread with the correct timestamp of when it was originally posted though, so simply reloading the channel will resolve the out-of-order behavior you are initially experiencing. This is also something I would like to improve in the future if possible. (Note that this behavior was changed for Wrangler after v0.3.0 was cut)
