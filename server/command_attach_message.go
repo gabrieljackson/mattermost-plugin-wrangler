@@ -58,6 +58,11 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	// 4. The command was run from the original channel with the posts, so they
 	//    are also a member of that channel.
 
+	currentTeam, appErr := p.API.GetTeam(extra.TeamId)
+	if appErr != nil {
+		return nil, false, errors.Wrap(appErr, "failed to lookup lookup team")
+	}
+
 	newRootID := postToAttachTo.Id
 	if len(postToAttachTo.RootId) != 0 {
 		newRootID = postToAttachTo.RootId
@@ -137,7 +142,7 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	if extra.UserId != postToBeAttached.UserId {
 		// The wrangled message was not created by the user running the command.
 		// Send a DM to the user who created it to let them know.
-		err := p.postAttachMessageBotDM(postToBeAttached.UserId, makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, newPost.Id))
+		err := p.postAttachMessageBotDM(postToBeAttached.UserId, makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, currentTeam.Name, newPost.Id))
 		if err != nil {
 			p.API.LogError("Unable to send attach-message DM to user",
 				"error", err.Error(),

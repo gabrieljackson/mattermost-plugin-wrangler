@@ -9,8 +9,8 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-func makePostLink(siteURL, postID string) string {
-	return fmt.Sprintf("%s/_redirect/pl/%s", siteURL, postID)
+func makePostLink(siteURL, teamName, postID string) string {
+	return fmt.Sprintf("%s/%s/pl/%s", siteURL, teamName, postID)
 }
 
 func cleanPost(post *model.Post) {
