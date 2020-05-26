@@ -34,19 +34,9 @@ function getMoveThreadPostID(state = '', action: OpenMoveThreadAction) {
     }
 }
 
-function getChannelsForTeam(state: Channels | null = null, action: ReceivedChannelsForTeamAction) {
-    switch (action.type) {
-    case RECEIVED_CHANNELS_FOR_TEAM:
-        return action.channels;
-    default:
-        return state;
-    }
-}
-
 const rootReducer = combineReducers({
     pluginSettings,
     getMoveThreadPostID,
-    getChannelsForTeam,
     moveThreadModalVisable,
 });
 

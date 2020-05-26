@@ -1,9 +1,10 @@
 import {GetStateFunc} from 'mattermost-redux/types/actions';
 import {Client4} from 'mattermost-redux/client';
+import {General} from 'mattermost-redux/constants';
 import {getCurrentChannel} from 'mattermost-redux/selectors/entities/channels';
 import {getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
 
-import {MoveThreadRequest, GetChannelsForTeamRequest} from '../types/api';
+import {MoveThreadRequest} from '../types/api';
 import id from '../plugin_id';
 
 export default class Client {
@@ -11,13 +12,6 @@ export default class Client {
         return this.doFetch(
             `${this.getAPIV1BaseRoute()}/settings`,
             {method: 'get'},
-        );
-    }
-
-    getChannelsForTeam = async (req: GetChannelsForTeamRequest) => {
-        return this.doFetch(
-            `${this.getAPIV1BaseRoute()}/channels-for-team-for-user`,
-            {method: 'post', body: JSON.stringify(req)},
         );
     }
 

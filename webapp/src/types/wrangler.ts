@@ -15,11 +15,4 @@ export type ReceivedPluginSettingsAction = {
     settings: Settings;
 };
 
-export const RECEIVED_CHANNELS_FOR_TEAM = `${id}_received_channels_for_team`;
-
-export type ReceivedChannelsForTeamAction = {
-    type: typeof RECEIVED_CHANNELS_FOR_TEAM;
-    channels: Channels;
-};
-
-export type WranglerActionType = ReceivedPluginSettingsAction | ReceivedChannelsForTeamAction;
+export type WranglerActionType = ReceivedPluginSettingsAction;

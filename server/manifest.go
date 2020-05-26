@@ -42,7 +42,7 @@ const manifestStr = `
       },
       {
         "key": "EnableWebUI",
-        "display_name": "Enable Wrangler webapp functionality [ALPHA]",
+        "display_name": "Enable Wrangler webapp functionality [BETA]",
         "type": "bool",
         "help_text": "Enable the work-in-progress Wrangler webapp functionality.",
         "placeholder": "",
