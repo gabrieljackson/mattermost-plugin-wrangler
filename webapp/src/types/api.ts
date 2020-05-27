@@ -3,7 +3,3 @@ export type MoveThreadRequest = {
     thread_id: string;
     original_channel_id: string;
 }
-
-export type GetChannelsForTeamRequest = {
-    team_id: string;
-}

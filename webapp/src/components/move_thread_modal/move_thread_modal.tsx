@@ -57,8 +57,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         if (myTeams.length > 0) {
             const firstTeam = myTeams[0];
             firstTeamID = firstTeam.id;
-            const channelResponse = await this.props.getChannelsForTeam(firstTeamID);
-            channels = channelResponse.data;
+            channels = await this.props.getChannelsForTeam(firstTeamID);
             if (channels.length > 0) {
                 const firstChannel = channels[0];
                 firstChannelID = firstChannel.id;
@@ -75,8 +74,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
 
     private handleTeamSelectChange = async (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const teamID = event.target.value;
-        const channelResponse = await this.props.getChannelsForTeam(teamID);
-        const channels = channelResponse.data;
+        const channels = await this.props.getChannelsForTeam(teamID);
         let firstChannelID = '';
         if (channels.length > 0) {
             const firstChannel = channels[0];

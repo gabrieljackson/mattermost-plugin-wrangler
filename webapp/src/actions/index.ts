@@ -1,10 +1,9 @@
 import {GlobalState} from 'mattermost-redux/types/store';
 
-import {RECEIVED_PLUGIN_SETTINGS, RECEIVED_CHANNELS_FOR_TEAM} from '../types/wrangler';
+import {RECEIVED_PLUGIN_SETTINGS} from '../types/wrangler';
 import {OPEN_MOVE_THREAD_MODAL, CLOSE_MOVE_THREAD_MODAL} from '../types/ui';
 
 import Client from '../client';
-import {GetChannelsForTeamRequest} from '../types/api';
 
 export type GetStateFunc = () => GlobalState;
 export type ActionResult = {
@@ -54,24 +53,6 @@ export function getSettings(): ActionFunc {
         });
 
         return {data: settings};
-    };
-}
-
-export function getChannelsForTeam(teamID: string): ActionFunc {
-    return async (dispatch: DispatchFunc) => {
-        const {data: channels, error} = await Client.getChannelsForTeam({
-            team_id: teamID,
-        } as GetChannelsForTeamRequest);
-        if (error) {
-            return {error};
-        }
-
-        dispatch({
-            type: RECEIVED_CHANNELS_FOR_TEAM,
-            channels,
-        });
-
-        return {data: channels};
     };
 }
 

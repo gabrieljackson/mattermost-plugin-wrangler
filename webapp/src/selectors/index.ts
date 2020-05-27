@@ -9,5 +9,3 @@ export const getPluginSettings = (state: GlobalState) => pluginState(state).plug
 export const isMoveModalVisable = (state: GlobalState) => pluginState(state).moveThreadModalVisable;
 
 export const getMoveThreadPostID = (state: GlobalState) => pluginState(state).getMoveThreadPostID;
-
-export const getChannelsForTeamSel = (state: GlobalState) => pluginState(state).getChannelsForTeam;
