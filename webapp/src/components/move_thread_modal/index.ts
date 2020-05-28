@@ -3,9 +3,9 @@ import {Dispatch, Action, bindActionCreators} from 'redux';
 
 import {GlobalState} from 'mattermost-redux/types/store';
 import {Client4} from 'mattermost-redux/client';
-import {General} from 'mattermost-redux/constants';
 import {getTeam, getTeamMemberships} from 'mattermost-redux/selectors/entities/teams';
 import {Team} from 'mattermost-redux/types/teams';
+import {Channel} from 'mattermost-redux/types/channels';
 import {getPost} from 'mattermost-redux/selectors/entities/posts';
 
 import {isMoveModalVisable, getMoveThreadPostID} from '../../selectors';
@@ -44,9 +44,18 @@ function mapStateToProps(state: GlobalState) {
         return myTeams;
     };
 
-    const getChannelsForTeamFunc = (teamID: string) => {
-        const channels = Client4.getChannels(teamID, 0, General.CHANNELS_CHUNK_SIZE);
-        return channels;
+    const getChannelsForTeamFunc = async (teamID: string) => {
+        let allMyChannelsInTeam = Array<Channel>();
+        allMyChannelsInTeam = await Client4.getMyChannels(teamID);
+
+        const myOpenAndPrivateChannelsInTeam = Array<Channel>();
+        allMyChannelsInTeam.forEach((channel) => {
+            if (channel.type === 'O' || channel.type === 'P') {
+                myOpenAndPrivateChannelsInTeam.push(channel);
+            }
+        });
+
+        return myOpenAndPrivateChannelsInTeam;
     };
 
     return {
