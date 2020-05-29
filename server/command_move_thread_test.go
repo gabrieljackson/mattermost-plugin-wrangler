@@ -164,7 +164,7 @@ func TestMoveThreadCommand(t *testing.T) {
 			resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: model.NewId()})
 			require.NoError(t, err)
 			assert.True(t, isUserError)
-			assert.Contains(t, resp.Text, "Error: the 'move thread' command must be run from the channel containing the post")
+			assert.Contains(t, resp.Text, "Error: this command must be run from the channel containing the post")
 		})
 
 		postSlice := generatedPosts.ToSlice()
@@ -175,14 +175,14 @@ func TestMoveThreadCommand(t *testing.T) {
 				resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id, ParentId: rootPostID})
 				require.NoError(t, err)
 				assert.True(t, isUserError)
-				assert.Contains(t, resp.Text, "Error: the 'move thread' command cannot be run from inside the thread being moved; please run directly in the channel containing the thread you wish to move")
+				assert.Contains(t, resp.Text, "Error: this command cannot be run from inside the thread; please run directly in the channel containing the thread")
 			})
 
 			t.Run("rootId matches", func(t *testing.T) {
 				resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id, RootId: rootPostID})
 				require.NoError(t, err)
 				assert.True(t, isUserError)
-				assert.Contains(t, resp.Text, "Error: the 'move thread' command cannot be run from inside the thread being moved; please run directly in the channel containing the thread you wish to move")
+				assert.Contains(t, resp.Text, "Error: this command cannot be run from inside the thread; please run directly in the channel containing the thread")
 			})
 		})
 	})
@@ -207,7 +207,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: model.NewId()})
 		require.NoError(t, err)
 		assert.True(t, isUserError)
-		assert.Contains(t, resp.Text, "Error: the thread is 3 posts long, but the move thead command is configured to only move threads of up to 1 posts")
+		assert.Contains(t, resp.Text, "Error: the thread is 3 posts long, but this command is configured to only move threads of up to 1 posts")
 	})
 }
 
