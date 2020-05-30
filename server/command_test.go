@@ -64,6 +64,22 @@ func TestCommand(t *testing.T) {
 			})
 		})
 
+		t.Run("copy command", func(t *testing.T) {
+			t.Run("missing extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler copy"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+
+			t.Run("invalid extra args", func(t *testing.T) {
+				args := &model.CommandArgs{Command: "wrangler copy invalid"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, resp.Text, getHelp())
+			})
+		})
+
 		t.Run("attach command", func(t *testing.T) {
 			t.Run("missing extra args", func(t *testing.T) {
 				args := &model.CommandArgs{Command: "wrangler attach"}
