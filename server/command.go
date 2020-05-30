@@ -10,11 +10,9 @@ import (
 
 const helpText = `Wrangler Plugin - Slash Command Help
 
-/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
-  Move a given message, along with the thread it belongs to, to a given channel
-    - This can be on any channel in any team that you have joined
-    - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
-    - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
+%s
+
+%s
 
 /wrangler attach message [MESSAGE_ID_TO_BE_ATTACHED] [ROOT_MESSAGE_ID]
   Attach a given message to a thread in the same channel
@@ -34,6 +32,8 @@ const helpText = `Wrangler Plugin - Slash Command Help
 func getHelp() string {
 	return codeBlock(fmt.Sprintf(
 		helpText,
+		moveThreadUsage,
+		copyThreadUsage,
 		getListChannelsFlagSet().FlagUsages(),
 		getListMessagesFlagSet().FlagUsages(),
 	))
@@ -84,6 +84,16 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		switch stringArgs[2] {
 		case "thread":
 			handler = p.runMoveThreadCommand
+			stringArgs = stringArgs[3:]
+		}
+	case "copy":
+		if len(stringArgs) < 3 {
+			break
+		}
+
+		switch stringArgs[2] {
+		case "thread":
+			handler = p.runCopyThreadCommand
 			stringArgs = stringArgs[3:]
 		}
 	case "attach":
