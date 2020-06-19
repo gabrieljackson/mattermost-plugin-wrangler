@@ -4,9 +4,12 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHatCowboy} from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
-    postId: string;
+    postID: string;
     threadCount: number;
     isSystemMessage: boolean;
+    rootPostID: string;
+    needRootMessage: boolean;
+    getPostThread: Function;
     openMoveThreadModal: Function;
 }
 
@@ -18,11 +21,20 @@ export default class MoveThreadDropdown extends React.PureComponent<Props, State
             event.preventDefault();
         }
 
-        this.props.openMoveThreadModal(this.props.postId);
+        this.props.openMoveThreadModal(this.props.rootPostID);
     };
+
+    private getRootMessage() {
+        this.props.getPostThread(this.props.rootPostID);
+    }
 
     public render() {
         if (this.props.isSystemMessage) {
+            return null;
+        }
+
+        if (this.props.needRootMessage) {
+            this.getRootMessage();
             return null;
         }
 
