@@ -27,14 +27,14 @@ function mapStateToProps(state: GlobalState, props: Props) {
         if (post.root_id) {
             rootPostID = post.root_id;
             const rootPost = getPostSel(state, post.root_id);
-            if (rootPost) {
-                const postsInThread = state.entities.posts.postsInThread[rootPostID];
-                if (postsInThread) {
-                    threadCount = postsInThread.length + 1;
-                }
-            } else {
+            if (!rootPost) {
                 needRootMessage = true;
             }
+        }
+
+        const postsInThread = state.entities.posts.postsInThread[rootPostID];
+        if (postsInThread) {
+            threadCount = postsInThread.length + 1;
         }
     }
 

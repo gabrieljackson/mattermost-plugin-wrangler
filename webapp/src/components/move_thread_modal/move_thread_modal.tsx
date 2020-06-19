@@ -6,12 +6,15 @@ import Form from 'react-bootstrap/Form';
 import {Team} from 'mattermost-redux/types/teams';
 import {Channel} from 'mattermost-redux/types/channels';
 
+import {MessageActionType, MessageActionTypeMove, MessageActionTypeCopy} from '../../types/actions';
+
 interface Props {
     visible: boolean;
     postID: string;
     message: string;
     threadCount: number;
     moveThread: Function;
+    copyThread: Function;
     getMyTeams: Function;
     getChannelsForTeam: Function;
     closeMoveThreadModal: Function;
@@ -23,6 +26,8 @@ type State = {
     selectedTeam: string;
     selectedChannel: string;
     moveThreadButtonText: string;
+    actionType: MessageActionType,
+    actionWord: string,
 }
 
 export default class MoveThreadModal extends React.PureComponent<Props, State> {
@@ -34,7 +39,9 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             channelsInTeam: Array<Channel>(),
             selectedTeam: '',
             selectedChannel: '',
-            moveThreadButtonText: this.getMoveButtonText(),
+            moveThreadButtonText: this.getMoveButtonText('Move'),
+            actionType: MessageActionTypeMove,
+            actionWord: 'Move',
         };
     }
 
@@ -42,8 +49,8 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         this.loadTeams();
     }
 
-    componentDidUpdate(prevProps: Props) {
-        if (prevProps.threadCount !== this.props.threadCount) {
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        if (prevProps.threadCount !== this.props.threadCount || prevState.actionWord !== this.state.actionWord) {
             this.setButtonState();
         }
     }
@@ -97,7 +104,11 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             event.preventDefault();
         }
 
-        await this.props.moveThread(this.props.postID, this.state.selectedChannel);
+        if (this.state.actionType === MessageActionTypeMove) {
+            await this.props.moveThread(this.props.postID, this.state.selectedChannel);
+        } else {
+            await this.props.copyThread(this.props.postID, this.state.selectedChannel);
+        }
         this.props.closeMoveThreadModal();
     };
 
@@ -110,15 +121,15 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
     };
 
     private setButtonState() {
-        this.setState({moveThreadButtonText: this.getMoveButtonText()});
+        this.setState({moveThreadButtonText: this.getMoveButtonText(this.state.actionWord)});
     }
 
-    private getMoveButtonText() {
+    private getMoveButtonText(actionWord: string) {
         if (this.props.threadCount === 1) {
-            return 'Move Message';
+            return actionWord + ' Message';
         }
 
-        return 'Move Thread';
+        return actionWord + ' Thread';
     }
 
     private handleButtonOnMouseEnter() {
@@ -126,7 +137,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
     }
 
     private handleButtonOnMouseLeave() {
-        this.setState({moveThreadButtonText: this.getMoveButtonText()});
+        this.setState({moveThreadButtonText: this.getMoveButtonText(this.state.actionWord)});
     }
 
     public render() {
@@ -135,11 +146,12 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             disabled = true;
         }
 
-        let moveMessage = 'Move this message?';
-        let title = 'Wrangler - Move Message to Another Channel';
+        const actionWord = this.state.actionWord;
+        let title = 'Wrangler - ' + actionWord + ' Message to Another Channel';
+        let moveMessage = actionWord + ' this message?';
         if (this.props.threadCount > 1) {
-            title = 'Wrangler - Move Thread to Another Channel';
-            moveMessage = 'Move this thread of ' + this.props.threadCount + ' messages?';
+            title = 'Wrangler - ' + actionWord + ' Thread to Another Channel';
+            moveMessage = actionWord + ' this thread of ' + this.props.threadCount + ' messages?';
         }
 
         return (
@@ -159,6 +171,36 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
+                        <Form.Group>
+                            <Form.Label>{'Action'}</Form.Label>
+                            <fieldset
+                                key='actionType'
+                                className='multi-select__radio'
+                            >
+                                <div className='radio'>
+                                    <label>
+                                        <input
+                                            id={MessageActionTypeMove}
+                                            type='radio'
+                                            checked={this.state.actionType === MessageActionTypeMove}
+                                            onChange={() => this.setState({actionType: MessageActionTypeMove, actionWord: 'Move'})}
+                                        />
+                                        {'Move'}
+                                    </label>
+                                </div>
+                                <div className='radio'>
+                                    <label>
+                                        <input
+                                            id={MessageActionTypeCopy}
+                                            type='radio'
+                                            checked={this.state.actionType === MessageActionTypeCopy}
+                                            onChange={() => this.setState({actionType: MessageActionTypeCopy, actionWord: 'Copy'})}
+                                        />
+                                        {'Copy'}
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </Form.Group>
                         <Form.Group>
                             <Form.Label>{'Team'}</Form.Label>
                             <Form.Control
