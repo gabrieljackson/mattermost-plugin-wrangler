@@ -6,7 +6,7 @@ import {Client4} from 'mattermost-redux/client';
 import {getTeam, getTeamMemberships} from 'mattermost-redux/selectors/entities/teams';
 import {Team} from 'mattermost-redux/types/teams';
 import {Channel} from 'mattermost-redux/types/channels';
-import {getPost} from 'mattermost-redux/selectors/entities/posts';
+import {getPost as getPostSel} from 'mattermost-redux/selectors/entities/posts';
 
 import {isMoveModalVisable, getMoveThreadPostID} from '../../selectors';
 import {closeMoveThreadModal, moveThread} from '../../actions';
@@ -15,22 +15,14 @@ import MoveThreadModal from './move_thread_modal';
 
 function mapStateToProps(state: GlobalState) {
     let postID = getMoveThreadPostID(state);
-    let post = getPost(state, postID);
+    const post = getPostSel(state, postID);
     let message = '';
     let threadCount = 1;
 
     if (post) {
-        if (post.root_id) {
-            post = getPost(state, post.root_id);
-        }
-
+        threadCount = post.reply_count + 1;
         postID = post.id;
         message = post.message;
-
-        const postsInThread = state.entities.posts.postsInThread[postID];
-        if (postsInThread) {
-            threadCount = postsInThread.length + 1;
-        }
     }
 
     const getMyTeamsFunc = () => {
