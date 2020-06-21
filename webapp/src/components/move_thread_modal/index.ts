@@ -20,7 +20,10 @@ function mapStateToProps(state: GlobalState) {
     let threadCount = 1;
 
     if (post) {
-        threadCount = post.reply_count + 1;
+        const postsInThread = state.entities.posts.postsInThread[post.id];
+        if (postsInThread) {
+            threadCount = postsInThread.length + 1;
+        }
         postID = post.id;
         message = post.message;
     }
