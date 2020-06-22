@@ -9,7 +9,7 @@ import {Channel} from 'mattermost-redux/types/channels';
 import {getPost as getPostSel} from 'mattermost-redux/selectors/entities/posts';
 
 import {isMoveModalVisable, getMoveThreadPostID} from '../../selectors';
-import {closeMoveThreadModal, moveThread} from '../../actions';
+import {closeMoveThreadModal, moveThread, copyThread} from '../../actions';
 
 import MoveThreadModal from './move_thread_modal';
 
@@ -67,6 +67,7 @@ function mapDispatchToProps(dispatch: Dispatch<Action>) {
     return bindActionCreators({
         closeMoveThreadModal,
         moveThread,
+        copyThread,
     }, dispatch);
 }
 

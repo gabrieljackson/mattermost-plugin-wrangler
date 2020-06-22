@@ -64,3 +64,12 @@ export function moveThread(postID: string, threadID: string): ActionFunc {
         return {data: null};
     };
 }
+
+export function copyThread(postID: string, threadID: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const command = `/wrangler copy thread ${postID} ${threadID}`;
+        await Client.clientExecuteCommand(getState, command);
+
+        return {data: null};
+    };
+}

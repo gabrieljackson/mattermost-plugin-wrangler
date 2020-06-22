@@ -38,9 +38,9 @@ export default class MoveThreadDropdown extends React.PureComponent<Props, State
             return null;
         }
 
-        let content = 'Move Message';
+        let content = 'Move/Copy Message';
         if (this.props.threadCount > 1) {
-            content = 'Move Thread';
+            content = 'Move/Copy Thread';
         }
 
         return (
