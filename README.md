@@ -38,7 +38,13 @@ Wrangler Plugin - Slash Command Help
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
     - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
 
-/wrangler attach message [MESSAGE_ID_TO_BE_ATTACHED] [ROOT_MESSAGE_ID]
+/wrangler copy thread [MESSAGE_ID] [CHANNEL_ID]
+  Copy a given message, along with the thread it belongs to, to a given channel
+    - This can be on any channel in any team that you have joined
+    - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
+    - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
+
+/wrangler attach message [MESSAGE_ID_TO_ATTACH] [ROOT_MESSAGE_ID]
   Attach a given message to a thread in the same channel
     - Obtain the message IDs by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
 
@@ -73,6 +79,10 @@ A thread that was started in `channel1` is moved to `channel2`.
 The thread after being "moved" to `channel2`.
 
 ![channel2](https://user-images.githubusercontent.com/3694686/73672959-d499ea80-467b-11ea-97dc-4a2e33c8829e.png)
+
+#### /wrangler copy thread
+
+Similar to the move command, this will duplicate a message or thread and put the copy in another new channel.
 
 #### /wrangler attach message
 
