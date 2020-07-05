@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -40,9 +41,19 @@ func (c *configuration) Clone() *configuration {
 }
 
 func (c *configuration) IsValid() error {
-	_, err := url.Parse(c.AllowedEmailDomain)
-	if err != nil {
-		return errors.Wrap(err, "invalid AllowedEmailDomain")
+	var err error
+
+	if len(c.AllowedEmailDomain) != 0 {
+		emailDomains := strings.Split(c.AllowedEmailDomain, ",")
+		for _, emailDomain := range emailDomains {
+			if len(emailDomain) == 0 {
+				return errors.New("AllowedEmailDomain has a trailing comma")
+			}
+			_, err = url.Parse(emailDomain)
+			if err != nil {
+				return errors.Wrapf(err, "invalid AllowedEmailDomain value %s", emailDomain)
+			}
+		}
 	}
 
 	_, err = parseAndValidateMaxThreadCountMoveSize(c.MoveThreadMaxCount)

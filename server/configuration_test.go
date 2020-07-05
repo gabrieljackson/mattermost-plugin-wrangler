@@ -16,6 +16,27 @@ func TestConfigurationIsValid(t *testing.T) {
 		require.NoError(t, baseConfiguration.IsValid())
 	})
 
+	t.Run("AllowedEmailDomain", func(t *testing.T) {
+		config := baseConfiguration
+
+		t.Run("empty", func(t *testing.T) {
+			config.AllowedEmailDomain = ""
+			require.NoError(t, config.IsValid())
+		})
+		t.Run("full email", func(t *testing.T) {
+			config.AllowedEmailDomain = "user@mattermost.com"
+			require.NoError(t, config.IsValid())
+		})
+		t.Run("multiple domains", func(t *testing.T) {
+			config.AllowedEmailDomain = "mattermost.com,google.com"
+			require.NoError(t, config.IsValid())
+		})
+		t.Run("trailing comma", func(t *testing.T) {
+			config.AllowedEmailDomain = "mattermost.com,google.com,"
+			require.Error(t, config.IsValid())
+		})
+	})
+
 	t.Run("MaxThreadCountMoveSize", func(t *testing.T) {
 		config := baseConfiguration
 

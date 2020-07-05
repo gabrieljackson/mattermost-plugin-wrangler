@@ -160,9 +160,14 @@ func (p *Plugin) authorizedPluginUser(userID string) bool {
 			return false
 		}
 
-		if !strings.HasSuffix(user.Email, config.AllowedEmailDomain) {
-			return false
+		emailDomains := strings.Split(config.AllowedEmailDomain, ",")
+		for _, emailDomain := range emailDomains {
+			if strings.HasSuffix(user.Email, emailDomain) {
+				return true
+			}
 		}
+
+		return false
 	}
 
 	return true

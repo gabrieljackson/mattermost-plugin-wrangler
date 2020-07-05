@@ -16,7 +16,7 @@ func TestCommand(t *testing.T) {
 
 	commandUser := &model.User{
 		Id:    model.NewId(),
-		Email: "emaildomain.com",
+		Email: "user@emaildomain.com",
 	}
 
 	api := &plugintest.API{}
@@ -161,8 +161,75 @@ func TestCommand(t *testing.T) {
 				UserId:  model.NewId(),
 				Command: "wrangler info",
 			}
-			_, appErr := plugin.ExecuteCommand(context, args)
-			require.Error(t, appErr)
+			resp, appErr := plugin.ExecuteCommand(context, args)
+			require.Nil(t, appErr)
+			assert.Equal(t, resp.Text, "Permission denied. Please talk to your system administrator to get access.")
+		})
+
+		t.Run("multiple domains", func(t *testing.T) {
+			t.Run("user in first domain", func(t *testing.T) {
+				plugin.setConfiguration(&configuration{
+					AllowedEmailDomain: "emaildomain.com,anotherdomain.com",
+				})
+				args := &model.CommandArgs{
+					UserId:  commandUser.Id,
+					Command: "wrangler info",
+				}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				infoResp, userError, err := plugin.runInfoCommand([]string{}, nil)
+				require.NoError(t, err)
+				assert.False(t, userError)
+				assert.Equal(t, resp, infoResp)
+			})
+
+			t.Run("user in second domain", func(t *testing.T) {
+				commandUser.Email = "user@anotherdomain.com"
+				plugin.setConfiguration(&configuration{
+					AllowedEmailDomain: "emaildomain.com,anotherdomain.com",
+				})
+				args := &model.CommandArgs{
+					UserId:  commandUser.Id,
+					Command: "wrangler info",
+				}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				infoResp, userError, err := plugin.runInfoCommand([]string{}, nil)
+				require.NoError(t, err)
+				assert.False(t, userError)
+				assert.Equal(t, resp, infoResp)
+			})
+
+			t.Run("user in neither domain", func(t *testing.T) {
+				commandUser.Email = "user@anotherbaddomain.com"
+				plugin.setConfiguration(&configuration{
+					AllowedEmailDomain: "emaildomain.com,anotherdomain.com",
+				})
+				args := &model.CommandArgs{
+					UserId:  commandUser.Id,
+					Command: "wrangler info",
+				}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				assert.Equal(t, resp.Text, "Permission denied. Please talk to your system administrator to get access.")
+			})
+
+			t.Run("user is a direct email match", func(t *testing.T) {
+				commandUser.Email = "user1@test.com"
+				plugin.setConfiguration(&configuration{
+					AllowedEmailDomain: "emaildomain.com,anotherdomain.com,user1@test.com",
+				})
+				args := &model.CommandArgs{
+					UserId:  commandUser.Id,
+					Command: "wrangler info",
+				}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				infoResp, userError, err := plugin.runInfoCommand([]string{}, nil)
+				require.NoError(t, err)
+				assert.False(t, userError)
+				assert.Equal(t, resp, infoResp)
+			})
 		})
 	})
 }

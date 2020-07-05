@@ -26,7 +26,7 @@ const manifest = JSON.parse(`
                 "key": "AllowedEmailDomain",
                 "display_name": "Allowed Email Domain",
                 "type": "text",
-                "help_text": "(Optional) When set, users must have an email ending in this domain to use the wrangler slash command.",
+                "help_text": "(Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas.",
                 "placeholder": "",
                 "default": null
             },
