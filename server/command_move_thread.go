@@ -109,7 +109,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	msg := fmt.Sprintf("A thread has been moved: %s\n", newPostLink)
 	msg += fmt.Sprintf(
 		"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
-		targetTeam.Name, targetChannel.Name, wpl.NumPosts(),
+		targetTeam.DisplayName, targetChannel.DisplayName, wpl.NumPosts(),
 	)
 	msg += fmt.Sprintf("Original Thread Root Message:\n%s\n", quoteBlock(originalMessageSummary))
 

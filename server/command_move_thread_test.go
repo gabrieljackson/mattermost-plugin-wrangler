@@ -43,13 +43,15 @@ func TestMoveThreadCommand(t *testing.T) {
 	}
 
 	targetTeam := &model.Team{
-		Id:   model.NewId(),
-		Name: "target-team",
+		Id:          model.NewId(),
+		Name:        "target-team",
+		DisplayName: "Target Team",
 	}
 	targetChannel := &model.Channel{
-		Id:     model.NewId(),
-		TeamId: targetTeam.Id,
-		Name:   "target-channel",
+		Id:          model.NewId(),
+		TeamId:      targetTeam.Id,
+		Name:        "target-channel",
+		DisplayName: "Target Channel",
 	}
 
 	reactions := []*model.Reaction{
@@ -196,7 +198,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		assert.Contains(t, resp.Text, fmt.Sprintf("A thread has been moved: %s", makePostLink(*config.ServiceSettings.SiteURL, targetTeam.Name, "")))
 		assert.Contains(t, resp.Text, fmt.Sprintf(
 			"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
-			targetTeam.Name, targetChannel.Name, 3,
+			targetTeam.DisplayName, targetChannel.DisplayName, 3,
 		))
 		assert.Contains(t, resp.Text, quoteBlock("This is message 1"))
 	})
