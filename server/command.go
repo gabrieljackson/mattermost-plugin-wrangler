@@ -32,7 +32,7 @@ const helpText = `Wrangler Plugin - Slash Command Help
 func getHelp() string {
 	return codeBlock(fmt.Sprintf(
 		helpText,
-		moveThreadUsage,
+		getMoveThreadUsage(),
 		copyThreadUsage,
 		getListChannelsFlagSet().FlagUsages(),
 		getListMessagesFlagSet().FlagUsages(),
