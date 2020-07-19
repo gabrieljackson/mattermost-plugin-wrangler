@@ -28,6 +28,7 @@ type State = {
     moveThreadButtonText: string;
     actionType: MessageActionType,
     actionWord: string,
+    moveShowRootMessage: boolean,
 }
 
 export default class MoveThreadModal extends React.PureComponent<Props, State> {
@@ -42,6 +43,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             moveThreadButtonText: this.getMoveButtonText('Move'),
             actionType: MessageActionTypeMove,
             actionWord: 'Move',
+            moveShowRootMessage: true,
         };
     }
 
@@ -105,7 +107,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         }
 
         if (this.state.actionType === MessageActionTypeMove) {
-            await this.props.moveThread(this.props.postID, this.state.selectedChannel);
+            await this.props.moveThread(this.props.postID, this.state.selectedChannel, this.state.moveShowRootMessage);
         } else {
             await this.props.copyThread(this.props.postID, this.state.selectedChannel);
         }
@@ -152,6 +154,23 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         if (this.props.threadCount > 1) {
             title = 'Wrangler - ' + actionWord + ' Thread to Another Channel';
             moveMessage = actionWord + ' this thread of ' + this.props.threadCount + ' messages?';
+        }
+
+        let rootMessageCheckbox = null;
+        if (this.state.actionType === MessageActionTypeMove) {
+            rootMessageCheckbox = (
+                <div className='checkbox'>
+                    <label>
+                        <input
+                            type='checkbox'
+                            id='showRootMessageOption'
+                            checked={this.state.moveShowRootMessage}
+                            onChange={() => this.setState({moveShowRootMessage: !this.state.moveShowRootMessage})}
+                        />
+                        {'Show root message in move summary'}
+                    </label>
+                </div>
+            );
         }
 
         return (
@@ -248,6 +267,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                                 disabled={true}
                                 readOnly={true}
                             />
+                            {rootMessageCheckbox}
                         </Form.Group>
                     </Form>
                     <p><span className='pull-right'>{moveMessage}</span></p>
