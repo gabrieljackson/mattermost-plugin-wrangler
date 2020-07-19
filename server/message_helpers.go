@@ -32,6 +32,14 @@ func (p *Plugin) validateMoveOrCopy(wpl *WranglerPostList, originalChannel *mode
 		}
 	}
 
+	if !originalChannel.IsGroupOrDirect() {
+		// DM and GM channels are "teamless" so it doesn't make sense to check
+		// the MoveThreadToAnotherTeamEnable config when dealing with those.
+		if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != originalChannel.TeamId {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
+		}
+	}
+
 	if config.MaxThreadCountMoveSizeInt() != 0 && config.MaxThreadCountMoveSizeInt() < wpl.NumPosts() {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: the thread is %d posts long, but this command is configured to only move threads of up to %d posts", wpl.NumPosts(), config.MaxThreadCountMoveSizeInt())), true, nil
 	}
@@ -43,10 +51,6 @@ func (p *Plugin) validateMoveOrCopy(wpl *WranglerPostList, originalChannel *mode
 	_, appErr := p.API.GetChannelMember(targetChannel.Id, extra.UserId)
 	if appErr != nil {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: channel with ID %s doesn't exist or you are not a member", targetChannel.Id)), true, nil
-	}
-
-	if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != originalChannel.TeamId {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
 	}
 
 	if extra.RootId == wpl.RootPost().Id || extra.ParentId == wpl.RootPost().Id {
