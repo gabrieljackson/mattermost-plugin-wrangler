@@ -2,6 +2,7 @@ import {GlobalState} from 'mattermost-redux/types/store';
 
 import {RECEIVED_PLUGIN_SETTINGS} from '../types/wrangler';
 import {OPEN_MOVE_THREAD_MODAL, CLOSE_MOVE_THREAD_MODAL} from '../types/ui';
+import {INITIALIZE_ATTACH_POST, FINALIZE_ATTACH_POST, RichPost} from '../types/attach';
 
 import Client from '../client';
 
@@ -40,6 +41,27 @@ export function closeMoveThreadModal(): ActionFunc {
     };
 }
 
+export function startAttachingPost(post: RichPost): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        dispatch({
+            type: INITIALIZE_ATTACH_POST,
+            post,
+        });
+
+        return {data: null};
+    };
+}
+
+export function finishAttachingPost(): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        dispatch({
+            type: FINALIZE_ATTACH_POST,
+        });
+
+        return {data: null};
+    };
+}
+
 export function getSettings(): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         const {data: settings, error} = await Client.getSettings();
@@ -68,6 +90,15 @@ export function moveThread(postID: string, threadID: string, showRootMessage: bo
 export function copyThread(postID: string, threadID: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const command = `/wrangler copy thread ${postID} ${threadID}`;
+        await Client.clientExecuteCommand(getState, command);
+
+        return {data: null};
+    };
+}
+
+export function attachMessage(postToBeAttachedID: string, postToAttachToID: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const command = `/wrangler attach message ${postToBeAttachedID} ${postToAttachToID}`;
         await Client.clientExecuteCommand(getState, command);
 
         return {data: null};

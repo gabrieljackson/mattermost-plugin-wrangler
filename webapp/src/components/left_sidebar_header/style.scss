@@ -1,0 +1,34 @@
+.wrangler-left-sidebar {
+    margin: .5em 0 .5em;
+    padding: 0 0 0 14px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    animation-name: pulse;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+
+  @keyframes pulse {
+    0% {
+      color: var(--sidebar-text);
+    }
+    50% {
+      color: var(--button-bg);
+    }
+    100% {
+      color: var(--sidebar-text);
+    }
+  }
+}
+
+.wrangler-left-sidebar .btn-old-sidebar {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-right: 12px;
+  margin-left: auto;
+  float: right;
+  font-size: 1.3em;
+  color: var(--sidebar-text-80);
+}
