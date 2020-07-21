@@ -8,7 +8,9 @@ import reducer from './reducers';
 
 import SetupUI from './components/setup_ui';
 import MoveThreadModal from './components/move_thread_modal';
+import LeftSidebarHeader from './components/left_sidebar_header';
 import MoveThreadDropdown from './components/move_thread_dropdown';
+import AttachMessageDropdown from './components/attach_message_dropdown';
 
 const setupUILater = (registry: PluginRegistry, store: Store<object, Action<object>>): () => Promise<void> => async () => {
     registry.registerReducer(reducer);
@@ -17,7 +19,9 @@ const setupUILater = (registry: PluginRegistry, store: Store<object, Action<obje
 
     if (settings.data.enable_web_ui) {
         registry.registerRootComponent(MoveThreadModal);
+        registry.registerLeftSidebarHeaderComponent(LeftSidebarHeader);
         registry.registerPostDropdownMenuComponent(MoveThreadDropdown);
+        registry.registerPostDropdownMenuComponent(AttachMessageDropdown);
     }
 };
 

@@ -1,7 +1,8 @@
 import {combineReducers} from 'redux';
 
-import {RECEIVED_PLUGIN_SETTINGS, ReceivedPluginSettingsAction, RECEIVED_CHANNELS_FOR_TEAM, ReceivedChannelsForTeamAction, Settings, Channels} from '../types/wrangler';
+import {RECEIVED_PLUGIN_SETTINGS, ReceivedPluginSettingsAction, Settings} from '../types/wrangler';
 import {OPEN_MOVE_THREAD_MODAL, CLOSE_MOVE_THREAD_MODAL, UIActionType, OpenMoveThreadAction} from '../types/ui';
+import {INITIALIZE_ATTACH_POST, FINALIZE_ATTACH_POST, AttachPostInitializeAction} from '../types/attach';
 
 function pluginSettings(state: Settings | null = null, action: ReceivedPluginSettingsAction) {
     switch (action.type) {
@@ -34,9 +35,21 @@ function getMoveThreadPostID(state = '', action: OpenMoveThreadAction) {
     }
 }
 
+function postToBeAttached(state = '', action: AttachPostInitializeAction) {
+    switch (action.type) {
+    case INITIALIZE_ATTACH_POST:
+        return action.post;
+    case FINALIZE_ATTACH_POST:
+        return '';
+    default:
+        return state;
+    }
+}
+
 const rootReducer = combineReducers({
     pluginSettings,
     getMoveThreadPostID,
+    postToBeAttached,
     moveThreadModalVisable,
 });
 
