@@ -3,6 +3,7 @@ import {combineReducers} from 'redux';
 import {RECEIVED_PLUGIN_SETTINGS, ReceivedPluginSettingsAction, Settings} from '../types/wrangler';
 import {OPEN_MOVE_THREAD_MODAL, CLOSE_MOVE_THREAD_MODAL, UIActionType, OpenMoveThreadAction} from '../types/ui';
 import {INITIALIZE_ATTACH_POST, FINALIZE_ATTACH_POST, AttachPostInitializeAction} from '../types/attach';
+import {CopyToChannelInitializeAction, FINALIZE_COPY_TO_CHANNEL, INITIALIZE_COPY_TO_CHANNEL} from 'src/types/channel';
 
 function pluginSettings(state: Settings | null = null, action: ReceivedPluginSettingsAction) {
     switch (action.type) {
@@ -46,10 +47,22 @@ function postToBeAttached(state = '', action: AttachPostInitializeAction) {
     }
 }
 
+function channelToCopyTo(state = '', action: CopyToChannelInitializeAction) {
+    switch (action.type) {
+    case INITIALIZE_COPY_TO_CHANNEL:
+        return action.channel;
+    case FINALIZE_COPY_TO_CHANNEL:
+        return '';
+    default:
+        return state;
+    }
+}
+
 const rootReducer = combineReducers({
     pluginSettings,
     getMoveThreadPostID,
     postToBeAttached,
+    channelToCopyTo,
     moveThreadModalVisable,
 });
 

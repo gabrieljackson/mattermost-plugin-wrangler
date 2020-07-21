@@ -11,3 +11,5 @@ export const isMoveModalVisable = (state: GlobalState) => pluginState(state).mov
 export const getMoveThreadPostID = (state: GlobalState) => pluginState(state).getMoveThreadPostID;
 
 export const getPostToBeAttached = (state: GlobalState) => pluginState(state).postToBeAttached;
+
+export const getChannelToCopyTo = (state: GlobalState) => pluginState(state).channelToCopyTo;

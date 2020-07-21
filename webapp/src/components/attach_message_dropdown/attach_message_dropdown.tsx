@@ -16,7 +16,6 @@ interface Props {
     postToBeAttached: RichPost;
     isSystemMessage: boolean;
     isValidAttachMessage: boolean;
-    newSidebar: boolean;
     startAttachingPost: Function;
     finishAttachingPost: Function;
     attachMessage: Function;
