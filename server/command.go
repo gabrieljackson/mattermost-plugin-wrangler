@@ -154,12 +154,41 @@ func (p *Plugin) runInfoCommand(args []string, extra *model.CommandArgs) (*model
 func (p *Plugin) authorizedPluginUser(userID string) bool {
 	config := p.getConfiguration()
 
-	if len(config.AllowedEmailDomain) != 0 {
-		user, err := p.API.GetUser(userID)
-		if err != nil {
-			return false
-		}
+	p.API.LogWarn(config.PermittedWranglerUsers)
 
+	// There are only three valid values of permitted users. Although getting a
+	// value other than these three should never happen, we will be extra
+	// cautious and ensure this is the case before proceeding.
+	switch config.PermittedWranglerUsers {
+	case permittedUserSystemAdmins,
+		permittedUserSystemAdminsAndEmail,
+		permittedUserAllUsers:
+	default:
+		p.API.LogWarn(fmt.Sprintf("Permitted plugin user setting %s is invalid", config.PermittedWranglerUsers))
+		return false
+	}
+
+	user, err := p.API.GetUser(userID)
+	if err != nil {
+		return false
+	}
+
+	// System admins can always use the plugin.
+	if user.IsSystemAdmin() {
+		return true
+	}
+	if config.PermittedWranglerUsers == permittedUserSystemAdmins {
+		return false
+	}
+
+	// A quick check if all users are permitted.
+	if config.PermittedWranglerUsers == permittedUserAllUsers {
+		return true
+	}
+
+	// The only user permission setting left at this point is system admins and
+	// the allowed email domain list.
+	if len(config.AllowedEmailDomain) != 0 {
 		emailDomains := strings.Split(config.AllowedEmailDomain, ",")
 		for _, emailDomain := range emailDomains {
 			if strings.HasSuffix(user.Email, emailDomain) {

@@ -10,6 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	permittedUserSystemAdmins         = "system-admins"
+	permittedUserSystemAdminsAndEmail = "system-admins-and-email-domain"
+	permittedUserAllUsers             = "all-users"
+)
+
 // configuration captures the plugin's external configuration as exposed in the Mattermost server
 // configuration, as well as values computed from the configuration. Any public fields will be
 // deserialized from the Mattermost server configuration in OnConfigurationChange.
@@ -22,7 +28,9 @@ import (
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
 type configuration struct {
-	AllowedEmailDomain        string
+	PermittedWranglerUsers string
+	AllowedEmailDomain     string
+
 	EnableWebUI               bool
 	CommandAutoCompleteEnable bool
 

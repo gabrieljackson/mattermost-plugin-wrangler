@@ -19,6 +19,23 @@
         "footer": "",
         "settings": [
             {
+                "key": "PermittedWranglerUsers",
+                "display_name": "Permitted Wrangler Users",
+                "type": "dropdown",
+                "help_text": "Choose who is allowed to use the Wrangler plugin. (Other permissions below still apply)",
+                "default": "system-admins",
+                "options": [{
+                    "display_name": "System administrators only",
+                    "value": "system-admins"
+                }, {
+                    "display_name": "System administrators and users from the 'Allowed Email Domain' list",
+                    "value": "system-admins-and-email-domain"
+                }, {
+                    "display_name": "All users",
+                    "value": "all-users"
+                }]
+            },
+            {
                 "key": "AllowedEmailDomain",
                 "display_name": "Allowed Email Domain",
                 "type": "text",
