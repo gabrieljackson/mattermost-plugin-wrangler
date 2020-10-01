@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -61,6 +62,7 @@ func (p *Plugin) validateMoveOrCopy(wpl *WranglerPostList, originalChannel *mode
 }
 
 func (p *Plugin) copyWranglerPostlist(wpl *WranglerPostList, targetChannel *model.Channel) (*model.Post, error) {
+	var err error
 	var appErr *model.AppError
 	var newRootPost *model.Post
 
@@ -114,17 +116,17 @@ func (p *Plugin) copyWranglerPostlist(wpl *WranglerPostList, targetChannel *mode
 		newPost.ChannelId = targetChannel.Id
 
 		if i == 0 {
-			newPost, appErr = p.API.CreatePost(newPost)
-			if appErr != nil {
-				return nil, errors.Wrap(appErr, "unable to create new root post")
+			newPost, err = p.createPostWithRetries(newPost, 200*time.Millisecond, 3)
+			if err != nil {
+				return nil, errors.Wrap(err, "unable to create new root post")
 			}
 			newRootPost = newPost.Clone()
 		} else {
 			newPost.RootId = newRootPost.Id
 			newPost.ParentId = newRootPost.Id
-			newPost, appErr = p.API.CreatePost(newPost)
-			if appErr != nil {
-				return nil, errors.Wrap(appErr, "unable to create new post")
+			newPost, err = p.createPostWithRetries(newPost, 200*time.Millisecond, 3)
+			if err != nil {
+				return nil, errors.Wrap(err, "unable to create new post")
 			}
 		}
 
@@ -140,4 +142,23 @@ func (p *Plugin) copyWranglerPostlist(wpl *WranglerPostList, targetChannel *mode
 	}
 
 	return newRootPost, nil
+}
+
+func (p *Plugin) createPostWithRetries(post *model.Post, retryDuration time.Duration, maxRetries int) (*model.Post, error) {
+	var retries int
+
+	for {
+		newPost, appErr := p.API.CreatePost(post)
+		if appErr == nil {
+			return newPost, nil
+		}
+		p.API.LogWarn("Failed to create post", "err", appErr)
+
+		retries++
+		if retries > maxRetries {
+			return nil, errors.Errorf("failed to create post after %d retries", maxRetries)
+		}
+
+		time.Sleep(retryDuration)
+	}
 }

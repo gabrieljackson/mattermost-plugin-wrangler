@@ -154,8 +154,6 @@ func (p *Plugin) runInfoCommand(args []string, extra *model.CommandArgs) (*model
 func (p *Plugin) authorizedPluginUser(userID string) bool {
 	config := p.getConfiguration()
 
-	p.API.LogWarn(config.PermittedWranglerUsers)
-
 	// There are only three valid values of permitted users. Although getting a
 	// value other than these three should never happen, we will be extra
 	// cautious and ensure this is the case before proceeding.
