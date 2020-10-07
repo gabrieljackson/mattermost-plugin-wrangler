@@ -31,13 +31,15 @@ export default class LeftSidebarElement extends React.PureComponent<Props, State
                 placement='right'
                 overlay={<Tooltip id={this.props.id + '-tooltip'}>{this.props.tooltip}</Tooltip>}
             >
-                <div className={'wrangler-left-sidebar'}>
-                    <FontAwesomeIcon
-                        className='MenuItem__icon'
-                        style={iconStyle}
-                        icon={faHatCowboy}
-                    />
-                    {this.props.text}
+                <div className={'wrangler-left-sidebar-wrapper'}>
+                    <div className={'wrangler-left-sidebar'}>
+                        <FontAwesomeIcon
+                            className='MenuItem__icon'
+                            style={iconStyle}
+                            icon={faHatCowboy}
+                        />
+                        {this.props.text}
+                    </div>
                     <button
                         type='button'
                         className={buttonClass}
