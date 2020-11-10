@@ -19,10 +19,15 @@ interface Props {
 
 function mapStateToProps(state: GlobalState, props: Props) {
     const post = getPost(state, props.postId);
-    const user = getUser(state, post.user_id);
-    const channel = getChannel(state, post.channel_id);
     const oldSystemMessageOrNull = post ? isSystemMessage(post) : true;
     const systemMessage = isCombinedUserActivityPost(post) || oldSystemMessageOrNull;
+
+    let user = null;
+    let channel = null;
+    if (!systemMessage) {
+        user = getUser(state, post.user_id);
+        channel = getChannel(state, post.channel_id);
+    }
 
     let validAttach = false;
     if (post) {
