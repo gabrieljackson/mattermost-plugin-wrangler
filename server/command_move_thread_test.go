@@ -247,11 +247,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
-		assert.Contains(t, resp.Text, fmt.Sprintf("A thread has been moved: %s", makePostLink(*config.ServiceSettings.SiteURL, targetTeam.Name, "")))
-		assert.Contains(t, resp.Text, fmt.Sprintf(
-			"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
-			targetTeam.DisplayName, targetChannel.DisplayName, 3,
-		))
+		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with 3 messages has been moved: %s", makePostLink(*config.ServiceSettings.SiteURL, targetTeam.Name, "")))
 		assert.Contains(t, resp.Text, quoteBlock("This is message 1"))
 	})
 
@@ -261,11 +257,7 @@ func TestMoveThreadCommand(t *testing.T) {
 		resp, isUserError, err := plugin.runMoveThreadCommand([]string{"id1", "id2", "--show-root-message-in-summary=false"}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
-		assert.Contains(t, resp.Text, fmt.Sprintf("A thread has been moved: %s", makePostLink(*config.ServiceSettings.SiteURL, targetTeam.Name, "")))
-		assert.Contains(t, resp.Text, fmt.Sprintf(
-			"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
-			targetTeam.DisplayName, targetChannel.DisplayName, 3,
-		))
+		assert.Contains(t, resp.Text, fmt.Sprintf("A thread with 3 messages has been moved: %s", makePostLink(*config.ServiceSettings.SiteURL, targetTeam.Name, "")))
 		assert.NotContains(t, resp.Text, "This is message 1")
 	})
 
