@@ -41,8 +41,10 @@ func getHelp() string {
 
 func getCommand(autocomplete bool) *model.Command {
 	return &model.Command{
-		Trigger:          "wrangler",
-		DisplayName:      "Wrangler",
+		//Trigger:          "wrangler",
+		Trigger:          "knowhow",
+		//DisplayName:      "Wrangler",
+		DisplayName:      "Knowhow",
 		Description:      "Manage Mattermost messages!",
 		AutoComplete:     autocomplete,
 		AutoCompleteDesc: "Available commands: move thread, copy thread, attach message, list messages, list channels, info",
@@ -55,7 +57,8 @@ func getCommandResponse(responseType, text string) *model.CommandResponse {
 	return &model.CommandResponse{
 		ResponseType: responseType,
 		Text:         text,
-		Username:     "wrangler",
+		//Username:     "wrangler",
+		Username:     "knowhow",
 		IconURL:      fmt.Sprintf("/plugins/%s/profile.png", manifest.Id),
 	}
 }
@@ -67,7 +70,18 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	}
 
 	stringArgs := strings.Split(args.Command, " ")
-
+        if len(stringArgs) < 2 {
+                return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getHelp()), nil
+        }
+        if len(stringArgs) > 2 {
+                return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getHelp()), nil
+        }
+	// execute copy thread with url(sugi)
+	var handler func([]string, *model.CommandArgs) (*model.CommandResponse, bool, error)
+	handler = p.runCopyThreadCommand
+	stringArgs = stringArgs[1:]
+	stringArgs = append(stringArgs, "e65kbw1grpgzmqkett3omk545w") // force to info-knowhow
+	/*
 	if len(stringArgs) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getHelp()), nil
 	}
@@ -124,7 +138,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		handler = p.runInfoCommand
 		stringArgs = stringArgs[2:]
 	}
-
+*/
 	if handler == nil {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getHelp()), nil
 	}
