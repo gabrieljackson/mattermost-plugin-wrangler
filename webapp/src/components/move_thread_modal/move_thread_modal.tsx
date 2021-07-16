@@ -29,6 +29,7 @@ type State = {
     actionType: MessageActionType,
     actionWord: string,
     moveShowRootMessage: boolean,
+    moveSilent: boolean,
 }
 
 export default class MoveThreadModal extends React.PureComponent<Props, State> {
@@ -44,6 +45,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             actionType: MessageActionTypeMove,
             actionWord: 'Move',
             moveShowRootMessage: true,
+            moveSilent: false,
         };
     }
 
@@ -107,7 +109,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         }
 
         if (this.state.actionType === MessageActionTypeMove) {
-            await this.props.moveThread(this.props.postID, this.state.selectedChannel, this.state.moveShowRootMessage);
+            await this.props.moveThread(this.props.postID, this.state.selectedChannel, this.state.moveShowRootMessage, this.state.moveSilent);
         } else {
             await this.props.copyThread(this.props.postID, this.state.selectedChannel);
         }
@@ -156,19 +158,32 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             moveMessage = actionWord + ' this thread of ' + this.props.threadCount + ' messages?';
         }
 
-        let rootMessageCheckbox = null;
+        let moveCheckboxes = null;
         if (this.state.actionType === MessageActionTypeMove) {
-            rootMessageCheckbox = (
-                <div className='checkbox'>
-                    <label>
-                        <input
-                            type='checkbox'
-                            id='showRootMessageOption'
-                            checked={this.state.moveShowRootMessage}
-                            onChange={() => this.setState({moveShowRootMessage: !this.state.moveShowRootMessage})}
-                        />
-                        {'Show root message in move summary'}
-                    </label>
+            moveCheckboxes = (
+                <div>
+                    <div className='checkbox'>
+                        <label>
+                            <input
+                                type='checkbox'
+                                id='showRootMessageOption'
+                                checked={this.state.moveShowRootMessage}
+                                onChange={() => this.setState({moveShowRootMessage: !this.state.moveShowRootMessage})}
+                            />
+                            {'Show root message in move summary'}
+                        </label>
+                    </div>
+                    <div className='checkbox'>
+                        <label>
+                            <input
+                                type='checkbox'
+                                id='showSilenceOption'
+                                checked={this.state.moveSilent}
+                                onChange={() => this.setState({moveSilent: !this.state.moveSilent})}
+                            />
+                            {'Silence all Wrangler informational messages'}
+                        </label>
+                    </div>
                 </div>
             );
         }
@@ -267,7 +282,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                                 disabled={true}
                                 readOnly={true}
                             />
-                            {rootMessageCheckbox}
+                            {moveCheckboxes}
                         </Form.Group>
                     </Form>
                     <p><span className='pull-right'>{moveMessage}</span></p>

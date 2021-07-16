@@ -102,9 +102,9 @@ export function getSettings(): ActionFunc {
     };
 }
 
-export function moveThread(postID: string, channelID: string, showRootMessage: boolean): ActionFunc {
+export function moveThread(postID: string, channelID: string, showRootMessage: boolean, silent: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const command = `/wrangler move thread ${postID} ${channelID} --show-root-message-in-summary=${showRootMessage}`;
+        const command = `/wrangler move thread ${postID} ${channelID} --show-root-message-in-summary=${showRootMessage} --silent=${silent}`;
         await Client.clientExecuteCommand(getState, command);
 
         return {data: null};
