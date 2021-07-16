@@ -29,7 +29,15 @@ func cleanAndTrimMessage(message string, trimLength int) string {
 }
 
 func cleanMessage(message string) string {
+	// Remove any leading whitespace and header markdown.
+	message = strings.TrimLeft(message, " ")
+	message = strings.TrimLeft(message, "#")
+	message = strings.TrimLeft(message, " ")
+
+	// Remove all code block markdown.
 	message = strings.Replace(message, "```", "", -1)
+
+	// Replace all newlines to keep summary condensed.
 	message = strings.Replace(message, "\n", " | ", -1)
 
 	return message
