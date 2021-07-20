@@ -15,7 +15,7 @@ const manifestStr = `
   "id": "com.mattermost.wrangler",
   "name": "Wrangler",
   "description": "Manage messages across teams and channels",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "min_server_version": "5.12.0",
   "server": {
     "executables": {
