@@ -28,7 +28,7 @@ export default class LeftSidebarCopyToChannel extends React.PureComponent<Props,
 
         const tooltipContent = (<div>
             <p>{'Howdy Partner!'}</p>
-            <p>{'It looks like you copying messages to the ' + channelToCopyTo.display_name + ' channel.'}</p>
+            <p>{'It looks like you are copying messages to the ' + channelToCopyTo.display_name + ' channel.'}</p>
             <p>{'Use the post dropdown on messages you want to copy and click the "X" right here to quit.'}</p>
         </div>);
 
