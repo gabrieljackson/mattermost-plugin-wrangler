@@ -43,6 +43,12 @@ func cleanMessage(message string) string {
 	return message
 }
 
+func cleanMessageJSON(message string) string {
+	message = strings.TrimLeft(message, " ")
+	message = strings.ReplaceAll(message, "\\n", "\n")
+	return message
+}
+
 func trimMessage(message string, trimLength int) string {
 	if len(message) <= trimLength {
 		return message

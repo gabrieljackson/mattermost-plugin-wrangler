@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -135,10 +136,15 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("A thread with %d message(s) has been silently moved: %s\n", wpl.NumPosts(), newPostLink)), false, nil
 	}
 
+	executor, execError := p.API.GetUser(extra.UserId)
+	if execError != nil {
+		return nil, false, errors.Wrap(appErr, "unable to find executor")
+	}
+
 	if extra.UserId != wpl.RootPost().UserId {
 		// The wrangled thread was not started by the user running the command.
 		// Send a DM to the user who created the root message to let them know.
-		err := p.postMoveThreadBotDM(wpl.RootPost().UserId, newPostLink)
+		err := p.postMoveThreadBotDM(wpl.RootPost().UserId, newPostLink, executor.Username)
 		if err != nil {
 			p.API.LogError("Unable to send move-thread DM to user",
 				"error", err.Error(),
@@ -162,8 +168,12 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_IN_CHANNEL, msg), false, nil
 }
 
-func (p *Plugin) postMoveThreadBotDM(userID, newPostLink string) error {
-	return p.PostBotDM(userID, fmt.Sprintf(
-		"Someone wrangled a thread you started to a new channel for you: %s", newPostLink,
-	))
+func (p *Plugin) postMoveThreadBotDM(userID, newPostLink string, executor string) error {
+	config := p.getConfiguration()
+
+	message := cleanMessageJSON(config.MoveThreadMessage)
+	message = strings.Replace(message, "{executor}", executor, -1)
+	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+
+	return p.PostBotDM(userID, message)
 }

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 const attachMessageCommand = `Error: missing arguments
@@ -139,10 +139,15 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 		"new_root_id", newRootID,
 	)
 
+	executor, execError := p.API.GetUser(extra.UserId)
+	if execError != nil {
+		return nil, false, errors.Wrap(appErr, "unable to find executor")
+	}
+
 	if extra.UserId != postToBeAttached.UserId {
 		// The wrangled message was not created by the user running the command.
 		// Send a DM to the user who created it to let them know.
-		err := p.postAttachMessageBotDM(postToBeAttached.UserId, makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, currentTeam.Name, newPost.Id))
+		err := p.postAttachMessageBotDM(postToBeAttached.UserId, makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, currentTeam.Name, newPost.Id), executor.Username)
 		if err != nil {
 			p.API.LogError("Unable to send attach-message DM to user",
 				"error", err.Error(),
@@ -156,8 +161,12 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, msg), false, nil
 }
 
-func (p *Plugin) postAttachMessageBotDM(userID, newPostLink string) error {
-	return p.PostBotDM(userID, fmt.Sprintf(
-		"Someone wrangled one of your messages into a thread for you: %s", newPostLink,
-	))
+func (p *Plugin) postAttachMessageBotDM(userID, newPostLink string, executor string) error {
+	config := p.getConfiguration()
+
+	message := cleanMessageJSON(config.ThreadAttachMessage)
+	message = strings.Replace(message, "{executor}", executor, -1)
+	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+
+	return p.PostBotDM(userID, message)
 }

@@ -39,6 +39,10 @@ type configuration struct {
 	MoveThreadFromPrivateChannelEnable       bool
 	MoveThreadFromDirectMessageChannelEnable bool
 	MoveThreadFromGroupMessageChannelEnable  bool
+
+	ThreadAttachMessage string
+	MoveThreadMessage   string
+	CopyThreadMessage   string
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if

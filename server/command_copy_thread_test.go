@@ -57,6 +57,10 @@ func TestCopyThreadCommand(t *testing.T) {
 		},
 	}
 
+	executor := &model.User{
+		Nickname: "executing user",
+	}
+
 	config := &model.Config{
 		ServiceSettings: model.ServiceSettings{
 			SiteURL: NewString("test.sampledomain.com"),
@@ -75,6 +79,7 @@ func TestCopyThreadCommand(t *testing.T) {
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
 	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
+	api.On("GetUser", mock.Anything).Return(executor, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
 	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
