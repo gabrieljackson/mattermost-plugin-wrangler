@@ -2,7 +2,27 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: circleci/golang:1.16-node
+      - image: cimg/go:1.18.5
+
+commands:
+  install-node-npm:
+    description: Install Node.js and npm
+    steps:
+      - run:
+          name: "Install Node.js and npm"
+          command: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            echo 'export NVM_DIR=$HOME/.nvm' >> $BASH_ENV
+            echo 'source $NVM_DIR/nvm.sh' >> $BASH_ENV
+            nvm install 16.9.1
+      - run:
+          name: Check current version of node
+          command: node -v
+      - run:
+          name: Check current version of NPM
+          command: npm -v
 
 jobs:
   lint:
@@ -10,13 +30,16 @@ jobs:
       name: default
     steps:
       - checkout
-      - run: make check-style
+      - install-node-npm
+      - run: make check-style-go
+      - run: make check-style-webapp
 
   test:
     executor:
       name: default
     steps:
       - checkout
+      - install-node-npm
       - run: make test
 
 workflows:

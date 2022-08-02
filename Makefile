@@ -30,14 +30,22 @@ all: check-style test dist
 apply:
 	./build/bin/manifest apply
 
-## Runs govet and gofmt against all packages.
+## Runs go and webapp style checks.
 .PHONY: check-style
-check-style: webapp/.npminstall gofmt govet golint
+check-style: check-style-go check-style-webapp
+
+## Runs npm style checks.
+.PHONY: check-style-webapp
+check-style-webapp: webapp/.npminstall
 	@echo Checking for style guide compliance
 
 ifneq ($(HAS_WEBAPP),)
 	cd webapp && npm run lint
 endif
+
+## Runs go style checks.
+.PHONY: check-style-go
+check-style-go: gofmt govet golint
 
 ## Runs gofmt against all packages.
 .PHONY: gofmt
