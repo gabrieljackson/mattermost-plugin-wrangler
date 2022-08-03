@@ -15,13 +15,13 @@ const manifestStr = `
   "id": "com.mattermost.wrangler",
   "name": "Wrangler",
   "description": "Manage messages across teams and channels",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "min_server_version": "5.12.0",
   "server": {
     "executables": {
       "freebsd-amd64": "server/dist/plugin-freebsd-amd64",
-      "linux-amd64": "server/dist/plugin-linux-amd64",
       "darwin-amd64": "server/dist/plugin-darwin-amd64",
+      "linux-amd64": "server/dist/plugin-linux-amd64",
       "windows-amd64": "server/dist/plugin-windows-amd64.exe"
     },
     "executable": ""
@@ -118,6 +118,30 @@ const manifestStr = `
         "help_text": "Control whether Wrangler is permitted to move message threads from group message channels or not.",
         "placeholder": "",
         "default": false
+      },
+      {
+        "key": "ThreadAttachMessage",
+        "display_name": "Info-Message: Attached a Message",
+        "type": "text",
+        "help_text": "The message being sent to the user after attaching his message to a thread. Allowed variables: {executor}, {postLink}",
+        "placeholder": "",
+        "default": "@{executor} wrangled one of your messages into a thread for you: {postLink}"
+      },
+      {
+        "key": "MoveThreadMessage",
+        "display_name": "Info-Message: Moved a Thread",
+        "type": "text",
+        "help_text": "The message being sent to the user after moving a thread. Allowed variables: {executor}, {postLink}",
+        "placeholder": "",
+        "default": "@{executor} wrangled a thread you started to a new channel for you: {postLink}"
+      },
+      {
+        "key": "CopyThreadMessage",
+        "display_name": "Info-Message: Copied a Thread",
+        "type": "text",
+        "help_text": "The message being sent to the user after copying a message. Allowed variables: {executor}, {postLink}",
+        "placeholder": "",
+        "default": "@{executor} wrangled a thread you started to a new channel for you: {postLink}"
       }
     ]
   }

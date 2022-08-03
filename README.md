@@ -8,9 +8,9 @@ A [Mattermost](https://mattermost.com) plugin for managing messages.
 
 ## About
 
-The wrangler plugin was created to provide advanced message management options. Currently, it supports two primary functions:
+Sometimes, Mattermost messages just don't end up in the right place. Wrangler can help with that. This plugin is for you if you have ever wanted to:
 
- 1. Move threads between channels.
+ 1. Move or copy a message thread to a new channel.
  2. Attach non-threaded messages to a thread.
 
 Both of these functions are designed to quickly bring messages to a place they likely have more relevance in. Example uses include moving a question to a channel where users have direct expertise or to attach a single message to a thread that it obviously was related to.
@@ -35,8 +35,11 @@ Wrangler Plugin - Slash Command Help
 /wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
   Move a given message, along with the thread it belongs to, to a given channel
     - This can be on any channel in any team that you have joined
-    - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
-    - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
+    - Use the '/wrangler list' commands to get message and channel IDs
+    Flags:
+      --show-root-message-in-summary   Show the root message in the post-move summary (default true)
+      --silent                         Silence all Wrangler summary messages and user DMs when moving the thread
+
 
 /wrangler copy thread [MESSAGE_ID] [CHANNEL_ID]
   Copy a given message, along with the thread it belongs to, to a given channel
@@ -121,7 +124,7 @@ The following plugin configuration is available:
 
 Q: I would very much like some UI please.
 
-A: That isn't a question, but I hear you. The initial UI for `move thread` can be enabled in plugin settings and more is on the way.
+A: That isn't a question, but I hear you. The Wrangler UI can be enabled in plugin settings.
 
 ---
 

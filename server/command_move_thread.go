@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -17,23 +18,28 @@ const (
 %s`
 
 	flagMoveThreadShowMessageSummary = "show-root-message-in-summary"
+	flagMoveThreadSilent             = "silent"
 )
 
 func getMoveThreadFlagSet() *pflag.FlagSet {
 	flagSet := pflag.NewFlagSet("move thread", pflag.ContinueOnError)
 	flagSet.Bool(flagMoveThreadShowMessageSummary, true, "Show the root message in the post-move summary")
+	flagSet.Bool(flagMoveThreadSilent, false, "Silence all Wrangler summary messages and user DMs when moving the thread")
 
 	return flagSet
 }
 
-func parseMoveThreadFlagArgs(args []string) (bool, error) {
+func parseMoveThreadFlagArgs(args []string) (bool, bool, error) {
 	flagSet := getMoveThreadFlagSet()
 	err := flagSet.Parse(args)
 	if err != nil {
-		return false, errors.Wrap(err, "unable to parse move thread flag args")
+		return false, false, errors.Wrap(err, "unable to parse move thread flag args")
 	}
 
-	return flagSet.GetBool(flagMoveThreadShowMessageSummary)
+	showMessageSummary, _ := flagSet.GetBool(flagMoveThreadShowMessageSummary)
+	silent, _ := flagSet.GetBool(flagMoveThreadSilent)
+
+	return showMessageSummary, silent, nil
 }
 
 func getMoveThreadUsage() string {
@@ -48,7 +54,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	if len(args) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getMoveThreadMessage()), true, nil
 	}
-	showRootMessageInSummary, err := parseMoveThreadFlagArgs(args)
+	showRootMessageInSummary, silent, err := parseMoveThreadFlagArgs(args)
 	if err != nil {
 		return nil, false, err
 	}
@@ -98,15 +104,17 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		return nil, false, err
 	}
 
-	_, appErr = p.API.CreatePost(&model.Post{
-		UserId:    p.BotUserID,
-		RootId:    newRootPost.Id,
-		ParentId:  newRootPost.Id,
-		ChannelId: channelID,
-		Message:   "This thread was moved from another channel",
-	})
-	if appErr != nil {
-		return nil, false, errors.Wrap(appErr, "unable to create new bot post")
+	if !silent {
+		_, appErr = p.API.CreatePost(&model.Post{
+			UserId:    p.BotUserID,
+			RootId:    newRootPost.Id,
+			ParentId:  newRootPost.Id,
+			ChannelId: channelID,
+			Message:   "This thread was moved from another channel",
+		})
+		if appErr != nil {
+			return nil, false, errors.Wrap(appErr, "unable to create new bot post")
+		}
 	}
 
 	// Cleanup is handled by simply deleting the root post. Any comments/replies
@@ -123,10 +131,20 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	)
 
 	newPostLink := makePostLink(*p.API.GetConfig().ServiceSettings.SiteURL, targetTeam.Name, newRootPost.Id)
+
+	if silent {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("A thread with %d message(s) has been silently moved: %s\n", wpl.NumPosts(), newPostLink)), false, nil
+	}
+
+	executor, execError := p.API.GetUser(extra.UserId)
+	if execError != nil {
+		return nil, false, errors.Wrap(appErr, "unable to find executor")
+	}
+
 	if extra.UserId != wpl.RootPost().UserId {
 		// The wrangled thread was not started by the user running the command.
 		// Send a DM to the user who created the root message to let them know.
-		err := p.postMoveThreadBotDM(wpl.RootPost().UserId, newPostLink)
+		err := p.postMoveThreadBotDM(wpl.RootPost().UserId, newPostLink, executor.Username)
 		if err != nil {
 			p.API.LogError("Unable to send move-thread DM to user",
 				"error", err.Error(),
@@ -135,11 +153,10 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 		}
 	}
 
-	msg := fmt.Sprintf("A thread has been moved: %s\n", newPostLink)
-	msg += fmt.Sprintf(
-		"\n| Team | Channel | Messages |\n| -- | -- | -- |\n| %s | %s | %d |\n\n",
-		targetTeam.DisplayName, targetChannel.DisplayName, wpl.NumPosts(),
-	)
+	msg := fmt.Sprintf("A thread with %d messages has been moved: %s\n", wpl.NumPosts(), newPostLink)
+	if wpl.NumPosts() == 1 {
+		msg = fmt.Sprintf("A message has been moved: %s\n", newPostLink)
+	}
 	if showRootMessageInSummary {
 		msg += fmt.Sprintf("Original Thread Root Message:\n%s\n",
 			quoteBlock(cleanAndTrimMessage(
@@ -151,8 +168,12 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_IN_CHANNEL, msg), false, nil
 }
 
-func (p *Plugin) postMoveThreadBotDM(userID, newPostLink string) error {
-	return p.PostBotDM(userID, fmt.Sprintf(
-		"Someone wrangled a thread you started to a new channel for you: %s", newPostLink,
-	))
+func (p *Plugin) postMoveThreadBotDM(userID, newPostLink string, executor string) error {
+	config := p.getConfiguration()
+
+	message := cleanMessageJSON(config.MoveThreadMessage)
+	message = strings.Replace(message, "{executor}", executor, -1)
+	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+
+	return p.PostBotDM(userID, message)
 }

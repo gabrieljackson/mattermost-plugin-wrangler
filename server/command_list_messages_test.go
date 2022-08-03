@@ -104,30 +104,56 @@ func TestMessagelListCommand(t *testing.T) {
 
 func TestCleanMessage(t *testing.T) {
 	tests := []struct {
-		name    string
-		message string
+		name     string
+		message  string
+		expected string
 	}{
 		{
-			name:    "no cleanup needed",
-			message: "short",
+			name:     "no cleanup needed",
+			message:  "short",
+			expected: "short",
 		},
 		{
-			name:    "remove codeblock",
-			message: "```code goes here```",
+			name:     "remove codeblock",
+			message:  "```code goes here```",
+			expected: "code goes here",
 		},
 		{
-			name:    "remove newlines",
-			message: "this message \n has multiple \n newlines \n probably",
+			name:     "remove newlines",
+			message:  "this message \n has multiple \n newlines \n probably",
+			expected: "this message  |  has multiple  |  newlines  |  probably",
 		},
 		{
-			name:    "remove codeblock and newlines",
-			message: "this `` ` ```message \n has` ``` multiple \n newlines \n probably ` ````",
+			name:     "remove codeblock and newlines",
+			message:  "this `` ` ```message \n has` ``` multiple \n newlines \n probably ` ````",
+			expected: "this `` ` message  |  has`  multiple  |  newlines  |  probably ` `",
+		},
+		{
+			name:     "exta leading whitespace",
+			message:  "   message1",
+			expected: "message1",
+		},
+		{
+			name:     "header markdown",
+			message:  "### message1",
+			expected: "message1",
+		},
+		{
+			name:     "extra whitespace and header markdown",
+			message:  "  ### message1",
+			expected: "message1",
+		},
+		{
+			name:     "cleanup everything",
+			message:  "  # this `` ` ```message \n has` ``` multiple \n newlines \n probably ` ````",
+			expected: "this `` ` message  |  has`  multiple  |  newlines  |  probably ` `",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cleanedMessage := cleanMessage(tt.message)
+			assert.Equal(t, tt.expected, cleanedMessage)
 			assert.NotContains(t, cleanedMessage, "```")
 			assert.NotContains(t, cleanedMessage, "\n")
 		})
