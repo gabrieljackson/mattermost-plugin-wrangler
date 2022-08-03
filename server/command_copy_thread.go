@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -93,10 +94,15 @@ func (p *Plugin) runCopyThreadCommand(args []string, extra *model.CommandArgs) (
 		"new_channel_id", channelID,
 	)
 
+	executor, execError := p.API.GetUser(extra.UserId)
+	if execError != nil {
+		return nil, false, errors.Wrap(appErr, "unable to find executor")
+	}
+
 	if extra.UserId != wpl.RootPost().UserId {
 		// The wrangled thread was not started by the user running the command.
 		// Send a DM to the user who created the root message to let them know.
-		err := p.postMoveThreadBotDM(wpl.RootPost().UserId, newPostLink)
+		err := p.postCopyThreadBotDM(wpl.RootPost().UserId, newPostLink, executor.Username)
 		if err != nil {
 			p.API.LogError("Unable to send copy-thread DM to user",
 				"error", err.Error(),
@@ -106,4 +112,14 @@ func (p *Plugin) runCopyThreadCommand(args []string, extra *model.CommandArgs) (
 	}
 
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Thread copy complete"), false, nil
+}
+
+func (p *Plugin) postCopyThreadBotDM(userID, newPostLink string, executor string) error {
+	config := p.getConfiguration()
+
+	message := cleanMessageJSON(config.CopyThreadMessage)
+	message = strings.Replace(message, "{executor}", executor, -1)
+	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+
+	return p.PostBotDM(userID, message)
 }
