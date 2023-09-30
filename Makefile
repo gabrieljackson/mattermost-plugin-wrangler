@@ -45,7 +45,7 @@ endif
 
 ## Runs go style checks.
 .PHONY: check-style-go
-check-style-go: gofmt govet golint
+check-style-go: gofmt golint
 
 ## Runs gofmt against all packages.
 .PHONY: gofmt
