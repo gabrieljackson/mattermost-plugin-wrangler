@@ -196,12 +196,9 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                 onExited={this.handleClose}
                 bsSize='large'
                 backdrop='static'
-                centered={true}
             >
                 <Modal.Header closeButton={true}>
-                    <Modal.Title>
-                        {title}
-                    </Modal.Title>
+                    <h1 className='modal-title'>{title}</h1>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -290,10 +287,10 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                 <Modal.Footer>
                     <button
                         id='footerClose'
-                        className='btn btn-link'
+                        className='btn btn-tertiary'
                         onClick={this.handleClose}
                     >
-                        {'Close'}
+                        {'Cancel'}
                     </button>
                     <button
                         id='saveSetting'
