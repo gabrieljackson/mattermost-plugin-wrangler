@@ -9,8 +9,9 @@ const manifest = JSON.parse(`
     "min_server_version": "5.12.0",
     "server": {
         "executables": {
-            "freebsd-amd64": "server/dist/plugin-freebsd-amd64",
             "darwin-amd64": "server/dist/plugin-darwin-amd64",
+            "darwin-arm64": "server/dist/plugin-darwin-arm64",
+            "freebsd-amd64": "server/dist/plugin-freebsd-amd64",
             "linux-amd64": "server/dist/plugin-linux-amd64",
             "windows-amd64": "server/dist/plugin-windows-amd64.exe"
         },
