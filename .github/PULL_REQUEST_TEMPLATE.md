@@ -1,4 +1,0 @@
-#### Release Note
-```release-note
-
-```
