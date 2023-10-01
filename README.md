@@ -2,18 +2,19 @@
 
 # Mattermost Wrangler Plugin
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/gabrieljackson/mattermost-plugin-wrangler)](https://goreportcard.com/report/github.com/gabrieljackson/mattermost-plugin-wrangler)
+![CI](https://github.com/gabrieljackson/mattermost-plugin-wrangler/actions/workflows/ci.yaml/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/gabrieljackson/mattermost-plugin-wrangler)](https://goreportcard.com/report/github.com/gabrieljackson/mattermost-plugin-wrangler)
 
 A [Mattermost](https://mattermost.com) plugin for managing messages.
 
 ## About
 
-Sometimes, Mattermost messages just don't end up in the right place. Wrangler can help with that. This plugin is for you if you have ever wanted to:
+Sometimes Mattermost messages just don't end up in the right place. Wrangler can help with that by providing the following:
 
- 1. Move or copy a message thread to a new channel.
- 2. Attach non-threaded messages to a thread.
+  1. Move a single message or thread to a new channel.
+  2. Copy a single message or thread to a new channel.
+  3. Attach non-threaded messages to a thread.
 
-Both of these functions are designed to quickly bring messages to a place they likely have more relevance in. Example uses include moving a question to a channel where users have direct expertise or to attach a single message to a thread that it obviously was related to.
+These functions are designed to quickly bring messages to a place they likely have more relevance in. Example uses include moving a question to a channel where users have direct expertise or to attach a single message to a thread that it obviously was related to.
 
 ## Install
 
@@ -24,6 +25,10 @@ Both of these functions are designed to quickly bring messages to a place they l
     1. [Enable integrations to override usernames](https://docs.mattermost.com/administration/config-settings.html#enable-integrations-to-override-usernames)
     2. [Enable integrations to override profile picture icons](https://docs.mattermost.com/administration/config-settings.html#enable-integrations-to-override-profile-picture-icons)
 5. Start using the plugin!
+
+## Questions?
+
+Start by reviewing the [FAQ](#faq) if you have any questions. Feel free to open a GitHub issue if you need additional assistance.
 
 ## Commands
 
@@ -112,25 +117,38 @@ The following plugin configuration is available:
  - Permitted Wrangler Users: Choose who is allowed to use the Wrangler plugin.
  - Allowed Email Domain: (Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas.
    - Example: `domain1.com,domain2.net,domain3.org`
+ - Enable Wrangler webapp functionality: Enable the work-in-progress Wrangler webapp functionality.
  - Enable Wrangler Command AutoComplete: Control whether command autocomplete is enabled or not. If enabled and Allowed Email Domain is set, then some users will be able to see the Wrangler commands, but will be unable to run them.
  - Max Thread Count Move Size: an optional setting to limit the size of threads that can be moved
  - Enable Moving Threads To Different Teams: Control whether Wrangler is permitted to move message threads from one team to another or not.
  - Enable Moving Threads From Private Channels: Control whether Wrangler is permitted to move message threads from private channels or not.
  - Enable Moving Threads From Direct Message Channels: Control whether Wrangler is permitted to move message threads from direct message channels or not.
  - Enable Moving Threads From Group Message Channels: Control whether Wrangler is permitted to move message threads from group message channels or not.
- - Enable Wrangler webapp functionality: Enable the work-in-progress Wrangler webapp functionality.
+ - Message customization: Various customization options are available to tailor the direct messages that are sent from Wrangler.
 
 ## FAQ
 
 Q: I would very much like some UI please.
 
-A: That isn't a question, but I hear you. The Wrangler UI can be enabled in plugin settings.
+A: That isn't a question, but I hear you. The Wrangler UI can be enabled in plugin settings in the system console.
+
+---
+
+Q: Why don't I see any command autocomplete options when I type `/wrangler`?
+
+A: Command autocomplete can also be enabled in plugin settings in the system console. Keep in mind that all users can see autocomplete prompts even if they don't have permissions to use Wrangler.
 
 ---
 
 Q: It would be awesome if Wrangler could do this other thing! Is that coming any time soon?
 
-A: Please open a GitHub issue and I would be happy to see if we can implement it.
+A: Please open a GitHub issue and I will see if we can implement it. Keep in mind that security and stability is always prioritized when adding features that may have edge cases where message management could have undesired outcomes.
+
+---
+
+Q: Why do I see `(message deleted)` when I use Wrangler?
+
+A: Wrangler often performs message management tasks by recreating messages and deleting the originals. This results in a fairly seamless experience, but does have some side effects that can't be resolved without some core changes to Mattermost itself. The `(message deleted)` system posts are the most common example of this. Ideally, future changes to Mattermost could allow for direct message movement which would provide a more seamless and efficient user experience. For now, this is the best we can do.
 
 ---
 
