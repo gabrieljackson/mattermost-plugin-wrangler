@@ -121,6 +121,14 @@ const manifestStr = `
         "default": false
       },
       {
+        "key": "MergeThreadEnable",
+        "display_name": "Enable Merging Threads [BETA]",
+        "type": "bool",
+        "help_text": "Control whether Wrangler is permitted to merge message threads. Depending on other plugin settings these threads can be merged across channels and teams. Note that message timestamps are preserved when threads are merged which could result in unexpected or confusing message ordering.",
+        "placeholder": "",
+        "default": false
+      },
+      {
         "key": "ThreadAttachMessage",
         "display_name": "Info-Message: Attached a Message",
         "type": "text",

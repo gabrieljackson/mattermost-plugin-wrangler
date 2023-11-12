@@ -41,21 +41,21 @@ func TestCommand(t *testing.T) {
 			args := &model.CommandArgs{UserId: user.Id}
 			resp, appErr := plugin.ExecuteCommand(context, args)
 			require.Nil(t, appErr)
-			require.Equal(t, getHelp(), resp.Text)
+			require.Equal(t, plugin.getHelp(), resp.Text)
 		})
 
 		t.Run("one arg", func(t *testing.T) {
 			args := &model.CommandArgs{UserId: user.Id, Command: "one"}
 			resp, appErr := plugin.ExecuteCommand(context, args)
 			require.Nil(t, appErr)
-			require.Equal(t, getHelp(), resp.Text)
+			require.Equal(t, plugin.getHelp(), resp.Text)
 		})
 
 		t.Run("two args, invalid command", func(t *testing.T) {
 			args := &model.CommandArgs{UserId: user.Id, Command: "one two"}
 			resp, appErr := plugin.ExecuteCommand(context, args)
 			require.Nil(t, appErr)
-			require.Equal(t, getHelp(), resp.Text)
+			require.Equal(t, plugin.getHelp(), resp.Text)
 		})
 
 		t.Run("move command", func(t *testing.T) {
@@ -63,14 +63,14 @@ func TestCommand(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler move"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 
 			t.Run("invalid extra args", func(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler move invalid"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 		})
 
@@ -79,14 +79,14 @@ func TestCommand(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler copy"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 
 			t.Run("invalid extra args", func(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler copy invalid"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 		})
 
@@ -95,14 +95,30 @@ func TestCommand(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler attach"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 
 			t.Run("invalid extra args", func(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler attach invalid"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
+			})
+		})
+
+		t.Run("merge command", func(t *testing.T) {
+			t.Run("missing extra args", func(t *testing.T) {
+				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler merge"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, plugin.getHelp(), resp.Text)
+			})
+
+			t.Run("invalid extra args", func(t *testing.T) {
+				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler merge invalid"}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 		})
 
@@ -111,14 +127,14 @@ func TestCommand(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler list"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 
 			t.Run("invalid extra args", func(t *testing.T) {
 				args := &model.CommandArgs{UserId: user.Id, Command: "wrangler list invalid"}
 				resp, appErr := plugin.ExecuteCommand(context, args)
 				require.Nil(t, appErr)
-				require.Equal(t, getHelp(), resp.Text)
+				require.Equal(t, plugin.getHelp(), resp.Text)
 			})
 		})
 	})

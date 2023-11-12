@@ -61,6 +61,69 @@ func (p *Plugin) validateMoveOrCopy(wpl *WranglerPostList, originalChannel *mode
 	return nil, false, nil
 }
 
+// validateMerge performs validation on a provided post list to determine if all
+// permissions are in place to allow the for the posts to be merged into another
+// thread.
+func (p *Plugin) validateMerge(wpl *WranglerPostList, targetRootPost *model.Post, originalChannel *model.Channel, targetChannel *model.Channel, extra *model.CommandArgs) (*model.CommandResponse, bool, error) {
+	if wpl.NumPosts() == 0 {
+		return nil, false, errors.New("The wrangler post list contains no posts")
+	}
+	if targetRootPost == nil {
+		return nil, false, errors.New("The target root post is nil")
+	}
+	if wpl.RootPost().Id == targetRootPost.Id {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: Original and target threads are the same"), true, nil
+	}
+
+	config := p.getConfiguration()
+
+	switch originalChannel.Type {
+	case model.CHANNEL_PRIVATE:
+		if !config.MoveThreadFromPrivateChannelEnable {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving posts from private channels"), false, nil
+		}
+	case model.CHANNEL_DIRECT:
+		if !config.MoveThreadFromDirectMessageChannelEnable {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving posts from direct message channels"), false, nil
+		}
+	case model.CHANNEL_GROUP:
+		if !config.MoveThreadFromGroupMessageChannelEnable {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving posts from group message channels"), false, nil
+		}
+	}
+
+	if !originalChannel.IsGroupOrDirect() {
+		// DM and GM channels are "teamless" so it doesn't make sense to check
+		// the MoveThreadToAnotherTeamEnable config when dealing with those.
+		if !config.MoveThreadToAnotherTeamEnable && targetChannel.TeamId != originalChannel.TeamId {
+			return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Wrangler is currently configured to not allow moving messages to different teams"), false, nil
+		}
+	}
+
+	if config.MaxThreadCountMoveSizeInt() != 0 && config.MaxThreadCountMoveSizeInt() < wpl.NumPosts() {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: the thread is %d posts long, but this command is configured to only move threads of up to %d posts", wpl.NumPosts(), config.MaxThreadCountMoveSizeInt())), true, nil
+	}
+
+	_, appErr := p.API.GetChannelMember(originalChannel.Id, extra.UserId)
+	if appErr != nil {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: Original channel with ID %s doesn't exist or you are not a member", originalChannel.Id)), true, nil
+	}
+	_, appErr = p.API.GetChannelMember(targetChannel.Id, extra.UserId)
+	if appErr != nil {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: Target channel with ID %s doesn't exist or you are not a member", targetChannel.Id)), true, nil
+	}
+
+	if wpl.RootPost().CreateAt < targetRootPost.CreateAt {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: Cannot merge older threads into newer threads. The destination thread must be older than the thread being moved."), true, nil
+	}
+
+	if extra.RootId == wpl.RootPost().Id || extra.ParentId == wpl.RootPost().Id {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: this command cannot be run from inside the thread; please run directly in the channel containing the thread"), true, nil
+	}
+
+	return nil, false, nil
+}
+
 func (p *Plugin) copyWranglerPostlist(wpl *WranglerPostList, targetChannel *model.Channel) (*model.Post, error) {
 	var err error
 	var appErr *model.AppError
@@ -161,4 +224,16 @@ func (p *Plugin) createPostWithRetries(post *model.Post, retryDuration time.Dura
 
 		time.Sleep(retryDuration)
 	}
+}
+
+func getRootPostFromPostList(postList *model.PostList) *model.Post {
+	if len(postList.Posts) == 0 {
+		return nil
+	}
+
+	postList.UniqueOrder()
+	postList.SortByCreateAt()
+	slice := postList.ToSlice()
+
+	return slice[len(slice)-1]
 }

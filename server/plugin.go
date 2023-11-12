@@ -56,7 +56,10 @@ func (p *Plugin) OnActivate() error {
 	}
 	p.BotUserID = botID
 
-	err = p.API.RegisterCommand(getCommand(config.CommandAutoCompleteEnable))
+	err = p.API.RegisterCommand(getCommand(
+		config.CommandAutoCompleteEnable,
+		config.MergeThreadEnable,
+	))
 	if err != nil {
 		return errors.Wrap(err, "failed to register wrangler command")
 	}

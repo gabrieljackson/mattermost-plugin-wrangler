@@ -39,6 +39,7 @@ type configuration struct {
 	MoveThreadFromPrivateChannelEnable       bool
 	MoveThreadFromDirectMessageChannelEnable bool
 	MoveThreadFromGroupMessageChannelEnable  bool
+	MergeThreadEnable                        bool
 
 	ThreadAttachMessage string
 	MoveThreadMessage   string
@@ -155,5 +156,8 @@ func (p *Plugin) OnConfigurationChange() error {
 
 	p.setConfiguration(configuration)
 
-	return p.API.RegisterCommand(getCommand(configuration.CommandAutoCompleteEnable))
+	return p.API.RegisterCommand(getCommand(
+		configuration.CommandAutoCompleteEnable,
+		configuration.MergeThreadEnable,
+	))
 }
