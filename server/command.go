@@ -11,13 +11,12 @@ import (
 const helpText = `Wrangler Plugin - Slash Command Help
 
 %s
-
 %s
 
 /wrangler attach message [MESSAGE_ID_TO_ATTACH] [ROOT_MESSAGE_ID]
   Attach a given message to a thread in the same channel
     - Obtain the message IDs by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
-
+%s
 /wrangler list channels [flags]
   List the IDs of all channels you have joined
 	Flags:
@@ -29,17 +28,23 @@ const helpText = `Wrangler Plugin - Slash Command Help
 /wrangler info
   Shows plugin information`
 
-func getHelp() string {
+func (p *Plugin) getHelp() string {
+	var optionalMergeThread string
+	if p.getConfiguration().MergeThreadEnable {
+		optionalMergeThread = mergeThreadUsage
+	}
+
 	return codeBlock(fmt.Sprintf(
 		helpText,
 		getMoveThreadUsage(),
 		copyThreadUsage,
+		optionalMergeThread,
 		getListChannelsFlagSet().FlagUsages(),
 		getListMessagesFlagSet().FlagUsages(),
 	))
 }
 
-func getCommand(autocomplete bool) *model.Command {
+func getCommand(autocomplete, mergedEnabled bool) *model.Command {
 	return &model.Command{
 		Trigger:          "wrangler",
 		DisplayName:      "Wrangler",
@@ -47,7 +52,7 @@ func getCommand(autocomplete bool) *model.Command {
 		AutoComplete:     autocomplete,
 		AutoCompleteDesc: "Available commands: move thread, copy thread, attach message, list messages, list channels, info",
 		AutoCompleteHint: "[command]",
-		AutocompleteData: getAutocompleteData(),
+		AutocompleteData: getAutocompleteData(mergedEnabled),
 	}
 }
 
@@ -69,7 +74,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	stringArgs := strings.Split(args.Command, " ")
 
 	if len(stringArgs) < 2 {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getHelp()), nil
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, p.getHelp()), nil
 	}
 
 	command := stringArgs[1]
@@ -107,6 +112,16 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 			handler = p.runAttachMessageCommand
 			stringArgs = stringArgs[3:]
 		}
+	case "merge":
+		if len(stringArgs) < 3 {
+			break
+		}
+
+		switch stringArgs[2] {
+		case "thread":
+			handler = p.runMergeThreadCommand
+			stringArgs = stringArgs[3:]
+		}
 	case "list":
 		if len(stringArgs) < 3 {
 			break
@@ -126,7 +141,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	}
 
 	if handler == nil {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getHelp()), nil
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, p.getHelp()), nil
 	}
 
 	resp, userError, err := handler(stringArgs, args)
@@ -200,7 +215,7 @@ func (p *Plugin) authorizedPluginUser(userID string) bool {
 	return true
 }
 
-func getAutocompleteData() *model.AutocompleteData {
+func getAutocompleteData(mergedEnabled bool) *model.AutocompleteData {
 	wrangler := model.NewAutocompleteData("wrangler", "[command]", "Available commands: move, copy, attach, list, info, help")
 
 	move := model.NewAutocompleteData("move", "[subcommand]", "Move messages")
@@ -223,6 +238,15 @@ func getAutocompleteData() *model.AutocompleteData {
 	attachMessage.AddTextArgument("The root message ID of the thread", "[ROOT_MESSAGE_ID]", "")
 	attach.AddCommand(attachMessage)
 	wrangler.AddCommand(attach)
+
+	if mergedEnabled {
+		merge := model.NewAutocompleteData("merge", "[subcommand]", "Merge threads")
+		mergeThread := model.NewAutocompleteData("thread", "[ROOT_MESSAGE_ID] [TARGET_ROOT_MESSAGE_ID]", "Merge a thread's messages into another existing thread")
+		mergeThread.AddTextArgument("The root message ID of the thread to be merged", "[ROOT_MESSAGE_ID]", "")
+		mergeThread.AddTextArgument("The root message ID of the thread to merge into", "[TARGET_ROOT_MESSAGE_ID]", "")
+		merge.AddCommand(mergeThread)
+		wrangler.AddCommand(merge)
+	}
 
 	list := model.NewAutocompleteData("list", "[subcommand]", "Lists IDs for channels and messages")
 	listChannels := model.NewAutocompleteData("channels", "[optional flags]", "List channel IDs that you have joined")
