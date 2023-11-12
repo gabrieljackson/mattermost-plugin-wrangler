@@ -5,6 +5,7 @@ import {Channel} from 'mattermost-redux/types/channels';
 import {RECEIVED_PLUGIN_SETTINGS} from '../types/wrangler';
 import {OPEN_MOVE_THREAD_MODAL, CLOSE_MOVE_THREAD_MODAL} from '../types/ui';
 import {INITIALIZE_ATTACH_POST, FINALIZE_ATTACH_POST, RichPost} from '../types/attach';
+import {INITIALIZE_MERGE_THREAD, FINALIZE_MERGE_THREAD} from '../types/merge';
 
 import Client from '../client';
 import {INITIALIZE_COPY_TO_CHANNEL, FINALIZE_COPY_TO_CHANNEL} from 'src/types/channel';
@@ -86,6 +87,27 @@ export function finishCopyToChannel(): ActionFunc {
     };
 }
 
+export function startMergingThread(post: RichPost): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        dispatch({
+            type: INITIALIZE_MERGE_THREAD,
+            post,
+        });
+
+        return {data: null};
+    };
+}
+
+export function finishMergingThread(): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        dispatch({
+            type: FINALIZE_MERGE_THREAD,
+        });
+
+        return {data: null};
+    };
+}
+
 export function getSettings(): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         const {data: settings, error} = await Client.getSettings();
@@ -123,6 +145,15 @@ export function copyThread(postID: string, channelID: string): ActionFunc {
 export function attachMessage(postToBeAttachedID: string, postToAttachToID: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const command = `/wrangler attach message ${postToBeAttachedID} ${postToAttachToID}`;
+        await Client.clientExecuteCommand(getState, command);
+
+        return {data: null};
+    };
+}
+
+export function mergeThread(postToBeMergedID: string, postToMergeToID: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const command = `/wrangler merge thread ${postToBeMergedID} ${postToMergeToID}`;
         await Client.clientExecuteCommand(getState, command);
 
         return {data: null};

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {RichPost} from 'src/types/attach';
+import {RichPost} from 'src/types/post';
 
 import LeftSidebarElement from '../left_sidebar_element';
 

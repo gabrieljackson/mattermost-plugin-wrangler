@@ -12,4 +12,6 @@ export const getMoveThreadPostID = (state: GlobalState) => pluginState(state).ge
 
 export const getPostToBeAttached = (state: GlobalState) => pluginState(state).postToBeAttached;
 
+export const getMergeThreadPost = (state: GlobalState) => pluginState(state).mergeThreadPost;
+
 export const getChannelToCopyTo = (state: GlobalState) => pluginState(state).channelToCopyTo;

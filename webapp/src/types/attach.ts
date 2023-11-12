@@ -1,14 +1,6 @@
-import {Post} from 'mattermost-redux/types/posts';
-import {UserProfile} from 'mattermost-redux/types/users';
-import {Channel} from 'mattermost-redux/types/channels';
-
 import id from '../plugin_id';
 
-export type RichPost = {
-    post: Post;
-    user: UserProfile;
-    channel: Channel;
-}
+import {RichPost} from './post';
 
 export const INITIALIZE_ATTACH_POST = `${id}_init_attach_post`;
 

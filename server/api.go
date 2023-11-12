@@ -57,16 +57,19 @@ func (p *Plugin) handleRouteAPISettings(w http.ResponseWriter, r *http.Request) 
 		return respondErr(w, http.StatusUnauthorized, errors.New("not authorized"))
 	}
 
-	var enabled bool
+	var webEnabled, mergeThreadEnabled bool
 	if p.getConfiguration().EnableWebUI && p.authorizedPluginUser(mattermostUserID) {
-		enabled = true
+		webEnabled = true
+		mergeThreadEnabled = p.getConfiguration().MergeThreadEnable
 	}
 
 	return respondJSON(w,
 		struct {
-			EnableWebUI bool `json:"enable_web_ui"`
+			EnableWebUI       bool `json:"enable_web_ui"`
+			EnableMergeThread bool `json:"enable_merge_thread"`
 		}{
-			EnableWebUI: enabled,
+			EnableWebUI:       webEnabled,
+			EnableMergeThread: mergeThreadEnabled,
 		},
 	)
 }

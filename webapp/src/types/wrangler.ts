@@ -4,6 +4,7 @@ import id from '../plugin_id';
 
 export type Settings = {
     enable_web_ui: boolean;
+    enable_merge_thread: boolean;
 }
 
 export type Channels = Array<Channel>
