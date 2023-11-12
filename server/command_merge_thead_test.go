@@ -101,7 +101,6 @@ func TestMergeThreadCommand(t *testing.T) {
 	api.On("GetPostThread", oldPostID).Return(oldGeneratedPosts, nil)
 
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
-	api.On("GetDirectChannel", mock.AnythingOfType("string")).Return(directChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string")).Return(targetTeam, nil)
 	api.On("GetUser", mock.AnythingOfType("string")).Return(executor, nil)
 	api.On("CreatePost", mock.Anything).Return(mockGeneratePost(), nil)

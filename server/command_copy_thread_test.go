@@ -68,23 +68,24 @@ func TestCopyThreadCommand(t *testing.T) {
 	}
 
 	generatedPosts := mockGeneratePostList(3, originalChannel.Id, false)
+	originalPostID := generatedPosts.ToSlice()[0].Id
 
 	api := &plugintest.API{}
 	api.On("GetChannel", originalChannel.Id).Return(originalChannel, nil)
 	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
 	api.On("GetChannel", directChannel.Id).Return(directChannel, nil)
 	api.On("GetChannel", groupChannel.Id).Return(groupChannel, nil)
-	api.On("GetChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetChannel, nil)
-	api.On("GetPostThread", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(generatedPosts, nil)
-	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
-	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
-	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
+	api.On("GetChannel", mock.AnythingOfType("string")).Return(targetChannel, nil)
+	api.On("GetPostThread", mock.AnythingOfType("string")).Return(generatedPosts, nil)
+	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
+	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything).Return(directChannel, nil)
+	api.On("GetTeam", mock.AnythingOfType("string")).Return(targetTeam, nil)
 	api.On("GetUser", mock.Anything).Return(executor, nil)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
-	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
+	api.On("DeletePost", mock.AnythingOfType("string")).Return(nil)
 	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
 	api.On("AddReaction", mock.Anything).Return(nil, nil)
-	api.On("GetConfig", mock.Anything).Return(config)
+	api.On("GetConfig").Return(config)
 	api.On("LogInfo",
 		mock.AnythingOfTypeArgument("string"),
 		mock.AnythingOfTypeArgument("string"),
@@ -189,6 +190,21 @@ func TestCopyThreadCommand(t *testing.T) {
 			})
 		})
 	})
+
+	api.On("GetChannelMember").Unset()
+	api.On("GetChannelMember", originalChannel.Id, mock.AnythingOfType("string")).Return(nil, nil)
+	targetCall := api.On("GetChannelMember", targetChannel.Id, mock.AnythingOfType("string"))
+	targetCall.Return(nil, &model.AppError{})
+
+	t.Run("no target channel member", func(t *testing.T) {
+		resp, isUserError, err := plugin.runCopyThreadCommand([]string{originalPostID, targetChannel.Id}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		require.NoError(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, resp.Text, "Error: channel with ID")
+	})
+
+	targetCall.Return(nil, nil)
+	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
 
 	t.Run("copy thread successfully", func(t *testing.T) {
 		require.NoError(t, plugin.configuration.IsValid())
