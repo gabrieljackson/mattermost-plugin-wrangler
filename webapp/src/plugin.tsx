@@ -13,8 +13,10 @@ import MoveThreadModal from './components/move_thread_modal';
 import MoveThreadDropdown from './components/move_thread_dropdown';
 import AttachMessageDropdown from './components/attach_message_dropdown';
 import CopyToChannelDropdown from './components/copy_to_channel_dropdown';
+import MergeThreadDropdown from './components/merge_thread_dropdown';
 import LeftSidebarAttachMessage from './components/left_sidebar_attach_message';
 import LeftSidebarCopyToChannel from './components/left_sidebar_copy_to_channel';
+import LeftSidebarMergeThread from './components/left_sidebar_merge_thread';
 
 const setupUILater = (registry: PluginRegistry, store: Store<object, Action<object>>): () => Promise<void> => async () => {
     registry.registerReducer(reducer);
@@ -32,6 +34,10 @@ const setupUILater = (registry: PluginRegistry, store: Store<object, Action<obje
             'Copy Messages to Channel',
             (channelId: string) => store.dispatch(startCopyToChannel(getChannel(store.getState(), channelId))),
         );
+        if (settings.data.enable_merge_thread) {
+            registry.registerLeftSidebarHeaderComponent(LeftSidebarMergeThread);
+            registry.registerPostDropdownMenuComponent(MergeThreadDropdown);
+        }
     }
 };
 

@@ -13,62 +13,56 @@ interface Props {
     post: Post;
     user: UserProfile;
     channel: Channel
-    postToBeAttached: RichPost;
+    mergeThreadPost: RichPost;
     isSystemMessage: boolean;
-    isValidAttachMessage: boolean;
-    startAttachingPost: Function;
-    finishAttachingPost: Function;
-    attachMessage: Function;
+    isValidMergeMessage: boolean;
+    startMergingThread: Function;
+    finishMergingThread: Function;
+    mergeThread: Function;
 }
 
 type State = {}
 
-export default class AttachMessageDropdown extends React.PureComponent<Props, State> {
-    private handleStartAttaching = async (event: React.MouseEvent) => {
+export default class MergeThreadDropdown extends React.PureComponent<Props, State> {
+    private handleStartMergingThread = async (event: React.MouseEvent) => {
         if (event && event.preventDefault) {
             event.preventDefault();
         }
-        const postToBeAttached = {
+        const mergeThreadPost = {
             post: this.props.post,
             user: this.props.user,
             channel: this.props.channel,
         };
-        this.props.startAttachingPost(postToBeAttached);
+        this.props.startMergingThread(mergeThreadPost);
     };
 
-    private handleAttachMessage = async (event: React.MouseEvent) => {
+    private handleMergeThread = async (event: React.MouseEvent) => {
         if (event && event.preventDefault) {
             event.preventDefault();
         }
 
-        this.props.attachMessage(this.props.postToBeAttached.post.id, this.props.post.id);
-        this.props.finishAttachingPost();
+        this.props.mergeThread(this.props.mergeThreadPost.post.id, this.props.post.id);
+        this.props.finishMergingThread();
     };
 
     public render() {
         if (this.props.isSystemMessage) {
             return null;
         }
-        if (!this.props.isValidAttachMessage && !this.props.postToBeAttached) {
+        if (!this.props.isValidMergeMessage && !this.props.mergeThreadPost) {
             return null;
         }
-        if (this.props.postToBeAttached) {
-            if (this.props.post.id === this.props.postToBeAttached.post.id) {
-                return null;
-            }
-            if (this.props.channel.id !== this.props.postToBeAttached.channel.id) {
-                return null;
-            }
-            if (this.props.post.create_at > this.props.postToBeAttached.post.create_at) {
+        if (this.props.mergeThreadPost) {
+            if (this.props.post.id === this.props.mergeThreadPost.post.id) {
                 return null;
             }
         }
 
-        let dropdownText = 'Attach to Thread';
-        let clickHandler = this.handleStartAttaching;
-        if (this.props.postToBeAttached) {
-            dropdownText = 'Attach to this Thread';
-            clickHandler = this.handleAttachMessage;
+        let dropdownText = 'Merge to thread';
+        let clickHandler = this.handleStartMergingThread;
+        if (this.props.mergeThreadPost) {
+            dropdownText = 'Merge to this Thread';
+            clickHandler = this.handleMergeThread;
         }
 
         return (
