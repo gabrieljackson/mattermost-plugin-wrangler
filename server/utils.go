@@ -13,6 +13,14 @@ func makePostLink(siteURL, teamName, postID string) string {
 	return fmt.Sprintf("%s/%s/pl/%s", siteURL, teamName, postID)
 }
 
+func makeBotDM(base, newPostLink, executor string) string {
+	message := cleanMessageJSON(base)
+	message = strings.Replace(message, "{executor}", executor, -1)
+	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+
+	return message
+}
+
 func cleanPost(post *model.Post) {
 	post.Id = ""
 	post.CreateAt = 0

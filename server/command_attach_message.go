@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 const attachMessageCommand = `Error: missing arguments
@@ -161,12 +161,9 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, msg), false, nil
 }
 
-func (p *Plugin) postAttachMessageBotDM(userID, newPostLink string, executor string) error {
+func (p *Plugin) postAttachMessageBotDM(userID, newPostLink, executor string) error {
 	config := p.getConfiguration()
-
-	message := cleanMessageJSON(config.ThreadAttachMessage)
-	message = strings.Replace(message, "{executor}", executor, -1)
-	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+	message := makeBotDM(config.ThreadAttachMessage, newPostLink, executor)
 
 	return p.PostBotDM(userID, message)
 }
