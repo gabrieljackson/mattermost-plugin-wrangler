@@ -75,6 +75,11 @@ func (p *Plugin) validateMerge(wpl *WranglerPostList, targetRootPost *model.Post
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: Original and target threads are the same"), true, nil
 	}
 
+	err := p.ensureOriginalAndTargetChannelMember(originalChannel.Id, targetChannel.Id, extra.UserId)
+	if err != nil {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, err.Error()), true, nil
+	}
+
 	config := p.getConfiguration()
 
 	switch originalChannel.Type {
@@ -104,15 +109,6 @@ func (p *Plugin) validateMerge(wpl *WranglerPostList, targetRootPost *model.Post
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: the thread is %d posts long, but this command is configured to only move threads of up to %d posts", wpl.NumPosts(), config.MaxThreadCountMoveSizeInt())), true, nil
 	}
 
-	_, appErr := p.API.GetChannelMember(originalChannel.Id, extra.UserId)
-	if appErr != nil {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: Original channel with ID %s doesn't exist or you are not a member", originalChannel.Id)), true, nil
-	}
-	_, appErr = p.API.GetChannelMember(targetChannel.Id, extra.UserId)
-	if appErr != nil {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: Target channel with ID %s doesn't exist or you are not a member", targetChannel.Id)), true, nil
-	}
-
 	if wpl.RootPost().CreateAt < targetRootPost.CreateAt {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: Cannot merge older threads into newer threads. The destination thread must be older than the thread being moved."), true, nil
 	}
@@ -122,6 +118,28 @@ func (p *Plugin) validateMerge(wpl *WranglerPostList, targetRootPost *model.Post
 	}
 
 	return nil, false, nil
+}
+
+func (p *Plugin) ensureOriginalAndTargetChannelMember(originalChannelID, targetChannelID, userID string) error {
+	err := p.ensureChannelMember(originalChannelID, userID)
+	if err != nil {
+		return errors.Wrap(err, "Error: Original Channel")
+	}
+	err = p.ensureChannelMember(targetChannelID, userID)
+	if err != nil {
+		return errors.Wrap(err, "Error: Target Channel")
+	}
+
+	return nil
+}
+
+func (p *Plugin) ensureChannelMember(channelID, userID string) error {
+	_, appErr := p.API.GetChannelMember(channelID, userID)
+	if appErr != nil {
+		return errors.Errorf("Channel with ID %s doesn't exist or you are not a member", channelID)
+	}
+
+	return nil
 }
 
 func (p *Plugin) copyWranglerPostlist(wpl *WranglerPostList, targetChannel *model.Channel) (*model.Post, error) {

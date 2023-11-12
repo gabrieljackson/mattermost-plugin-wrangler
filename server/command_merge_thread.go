@@ -34,11 +34,7 @@ func (p *Plugin) runMergeThreadCommand(args []string, extra *model.CommandArgs) 
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: unable to get post with ID %s; ensure this is correct", originalPostID)), true, nil
 	}
 	wpl := buildWranglerPostList(postListResponse)
-
-	originalChannel, appErr := p.API.GetChannel(wpl.RootPost().ChannelId)
-	if appErr != nil {
-		return nil, false, errors.Errorf("unable to get channel with ID %s", extra.ChannelId)
-	}
+	originalChannelID := wpl.RootPost().ChannelId
 
 	targetPostListResponse, appErr := p.API.GetPostThread(mergeToPostID)
 	if appErr != nil {
@@ -46,11 +42,15 @@ func (p *Plugin) runMergeThreadCommand(args []string, extra *model.CommandArgs) 
 	}
 	targetRootPost := getRootPostFromPostList(targetPostListResponse)
 
-	_, appErr = p.API.GetChannelMember(targetRootPost.ChannelId, extra.UserId)
-	if appErr != nil {
-		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: channel with ID %s doesn't exist or you are not a member", targetRootPost.ChannelId)), true, nil
+	err := p.ensureOriginalAndTargetChannelMember(originalChannelID, targetRootPost.ChannelId, extra.UserId)
+	if err != nil {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, err.Error()), true, nil
 	}
 
+	originalChannel, appErr := p.API.GetChannel(originalChannelID)
+	if appErr != nil {
+		return nil, false, errors.Errorf("unable to get channel with ID %s", originalChannelID)
+	}
 	targetChannel, appErr := p.API.GetChannel(targetRootPost.ChannelId)
 	if appErr != nil {
 		return nil, false, errors.Errorf("unable to get channel with ID %s", targetRootPost.ChannelId)
@@ -73,6 +73,7 @@ func (p *Plugin) runMergeThreadCommand(args []string, extra *model.CommandArgs) 
 		"original_channel_id", originalChannel.Id,
 		"target_root_post_id", targetRootPost.Id,
 		"target_root_post_channel_id", targetRootPost.ChannelId,
+		"merge_message_count", fmt.Sprintf("%d", wpl.NumPosts()),
 	)
 
 	// To merge threads, we first copy the original messages(s) to the new

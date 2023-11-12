@@ -93,22 +93,22 @@ func TestMergeThreadCommand(t *testing.T) {
 	api.On("GetChannel", targetChannel.Id).Return(targetChannel, nil)
 	api.On("GetChannel", oldPostID).Return(targetChannel, nil)
 
-	api.On("GetPostThread", originalPostID, mock.Anything, mock.Anything).Return(generatedOriginalPosts, nil)
-	api.On("GetPostThread", privatePostID, mock.Anything, mock.Anything).Return(generatedPrivatePosts, nil)
-	api.On("GetPostThread", directPostID, mock.Anything, mock.Anything).Return(generatedDirectPosts, nil)
-	api.On("GetPostThread", groupPostID, mock.Anything, mock.Anything).Return(generatedGroupPosts, nil)
-	api.On("GetPostThread", targetPostID, mock.Anything, mock.Anything).Return(generatedTargetPosts, nil)
-	api.On("GetPostThread", oldPostID, mock.Anything, mock.Anything).Return(oldGeneratedPosts, nil)
+	api.On("GetPostThread", originalPostID).Return(generatedOriginalPosts, nil)
+	api.On("GetPostThread", privatePostID).Return(generatedPrivatePosts, nil)
+	api.On("GetPostThread", directPostID).Return(generatedDirectPosts, nil)
+	api.On("GetPostThread", groupPostID).Return(generatedGroupPosts, nil)
+	api.On("GetPostThread", targetPostID).Return(generatedTargetPosts, nil)
+	api.On("GetPostThread", oldPostID).Return(oldGeneratedPosts, nil)
 
-	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(mockGenerateChannelMember(), nil)
-	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(directChannel, nil)
-	api.On("GetTeam", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(targetTeam, nil)
-	api.On("GetUser", mock.Anything).Return(executor, nil)
-	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
-	api.On("DeletePost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil)
+	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
+	api.On("GetDirectChannel", mock.AnythingOfType("string")).Return(directChannel, nil)
+	api.On("GetTeam", mock.AnythingOfType("string")).Return(targetTeam, nil)
+	api.On("GetUser", mock.AnythingOfType("string")).Return(executor, nil)
+	api.On("CreatePost", mock.Anything).Return(mockGeneratePost(), nil)
+	api.On("DeletePost", mock.AnythingOfType("string")).Return(nil)
 	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
 	api.On("AddReaction", mock.Anything).Return(nil, nil)
-	api.On("GetConfig", mock.Anything).Return(config)
+	api.On("GetConfig").Return(config)
 	api.On("LogInfo",
 		mock.AnythingOfTypeArgument("string"),
 		mock.AnythingOfTypeArgument("string"),
@@ -204,6 +204,30 @@ func TestMergeThreadCommand(t *testing.T) {
 		assert.True(t, isUserError)
 		assert.Contains(t, resp.Text, "Error: Cannot merge older threads into newer threads. The destination thread must be older than the thread being moved.")
 	})
+
+	api.On("GetChannelMember").Unset()
+	originalCall := api.On("GetChannelMember", originalChannel.Id, mock.AnythingOfType("string"))
+	targetCall := api.On("GetChannelMember", targetChannel.Id, mock.AnythingOfType("string"))
+	originalCall.Return(nil, &model.AppError{})
+	targetCall.Return(nil, &model.AppError{})
+
+	t.Run("no original channel member", func(t *testing.T) {
+		resp, isUserError, err := plugin.runMergeThreadCommand([]string{originalPostID, targetPostID}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		require.NoError(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, resp.Text, "Error: Original Channel: Channel with ID")
+	})
+
+	originalCall.Return(nil, nil)
+
+	t.Run("no target channel member", func(t *testing.T) {
+		resp, isUserError, err := plugin.runMergeThreadCommand([]string{originalPostID, targetPostID}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		require.NoError(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, resp.Text, "Error: Target Channel: Channel with ID")
+	})
+
+	targetCall.Return(nil, nil)
 
 	t.Run("merge thread successfully", func(t *testing.T) {
 		resp, isUserError, err := plugin.runMergeThreadCommand([]string{originalPostID, targetPostID}, &model.CommandArgs{ChannelId: originalChannel.Id})
