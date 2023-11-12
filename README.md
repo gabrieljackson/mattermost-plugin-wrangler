@@ -4,7 +4,7 @@
 
 ![CI](https://github.com/gabrieljackson/mattermost-plugin-wrangler/actions/workflows/ci.yaml/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/gabrieljackson/mattermost-plugin-wrangler)](https://goreportcard.com/report/github.com/gabrieljackson/mattermost-plugin-wrangler)
 
-A [Mattermost](https://mattermost.com) plugin for managing messages.
+A community supported [Mattermost](https://mattermost.com) [plugin](https://developers.mattermost.com/integrate/plugins) for managing messages.
 
 ## About
 
@@ -15,6 +15,8 @@ Sometimes Mattermost messages just don't end up in the right place. Wrangler can
   3. Attach non-threaded messages to a thread.
 
 These functions are designed to quickly bring messages to a place they likely have more relevance in. Example uses include moving a question to a channel where users have direct expertise or to attach a single message to a thread that it obviously was related to.
+
+![move-thread-modal](https://github.com/gabrieljackson/mattermost-plugin-wrangler/assets/3694686/8b92b9c8-879a-4780-af9e-d9866c70d680)
 
 ## Install
 
@@ -33,44 +35,6 @@ Start by reviewing the [FAQ](#faq) if you have any questions. Feel free to open 
 ## Commands
 
 Type `/wrangler` for a list of all Wrangler commands.
-
-```
-Wrangler Plugin - Slash Command Help
-
-/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
-  Move a given message, along with the thread it belongs to, to a given channel
-    - This can be on any channel in any team that you have joined
-    - Use the '/wrangler list' commands to get message and channel IDs
-    Flags:
-      --show-root-message-in-summary   Show the root message in the post-move summary (default true)
-      --silent                         Silence all Wrangler summary messages and user DMs when moving the thread
-
-
-/wrangler copy thread [MESSAGE_ID] [CHANNEL_ID]
-  Copy a given message, along with the thread it belongs to, to a given channel
-    - This can be on any channel in any team that you have joined
-    - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
-    - Obtain the channel ID by running '/wrangler list channels' or via the channel 'View Info' option
-
-/wrangler attach message [MESSAGE_ID_TO_ATTACH] [ROOT_MESSAGE_ID]
-  Attach a given message to a thread in the same channel
-    - Obtain the message IDs by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
-
-/wrangler list channels [flags]
-  List the IDs of all channels you have joined
-    Flags:
-      --channel-filter string   A filter value that channel names must contain to be shown on the list
-      --team-filter string      A filter value that team names must contain to be shown on the list
-
-/wrangler list messages [flags]
-  List the IDs of recent messages in this channel
-    Flags:
-      --count int         Number of messages to return. Must be between 1 and 100 (default 20)
-      --trim-length int   The max character count of messages listed before they are trimmed. Must be between 10 and 500 (default 50)
-
-/wrangler info
-  Shows plugin information
-```
 
 #### /wrangler move thread
 
@@ -155,3 +119,9 @@ A: Wrangler often performs message management tasks by recreating messages and d
 Q: When I run `/wranger attach message` it seems like the attached message is out of order?
 
 A: When attaching a message, it's necessary to create a new post in the thread which triggers the default behavior of Mattermost to show the message at the bottom of the channel. The message has been attached to the thread with the correct timestamp of when it was originally posted though, so simply reloading the channel will resolve the out-of-order behavior you are initially experiencing. This is also something I would like to improve in the future if possible. (Note that this behavior was changed for Wrangler after v0.3.0 was cut)
+
+---
+
+Q: What does it mean for a plugin to be community supported?
+
+A: Wrangler is one of many plugins that is available to be deployed to a Mattermost instance, but is not directly maintained by Mattermost. Instead, community contributions are accepted for fixes and new features.
