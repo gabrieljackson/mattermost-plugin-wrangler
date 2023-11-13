@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -114,12 +113,9 @@ func (p *Plugin) runCopyThreadCommand(args []string, extra *model.CommandArgs) (
 	return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Thread copy complete"), false, nil
 }
 
-func (p *Plugin) postCopyThreadBotDM(userID, newPostLink string, executor string) error {
+func (p *Plugin) postCopyThreadBotDM(userID, newPostLink, executor string) error {
 	config := p.getConfiguration()
-
-	message := cleanMessageJSON(config.CopyThreadMessage)
-	message = strings.Replace(message, "{executor}", executor, -1)
-	message = strings.Replace(message, "{postLink}", newPostLink, -1)
+	message := makeBotDM(config.CopyThreadMessage, newPostLink, executor)
 
 	return p.PostBotDM(userID, message)
 }
