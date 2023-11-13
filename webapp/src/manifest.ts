@@ -5,8 +5,8 @@ const manifest = JSON.parse(`
     "id": "com.mattermost.wrangler",
     "name": "Wrangler",
     "description": "Manage messages across teams and channels",
-    "version": "0.7.0",
-    "min_server_version": "5.12.0",
+    "version": "0.8.0",
+    "min_server_version": "7.1.0",
     "server": {
         "executables": {
             "darwin-amd64": "server/dist/plugin-darwin-amd64",
