@@ -122,6 +122,22 @@ A: When attaching a message, it's necessary to create a new post in the thread w
 
 ---
 
+Q: What are some of the edge cases of using Wrangler that I may want to know about?
+
+A: As mentioned above, Wrangler simulates moving messages by creating new messages and deleting the originals. As such, here are some things to keep in mind.
+
+If the process of creating the new messages fails for any reason then you may end up in a situation where some new messages exist at the target location along with all of the original messages remaining as they were. Wrangler only deletes the original messages after completing the given task successfully. The most common failure in message actions involves trying to manage lengthy threads that have many large file attachments. These attachments need to be duplicated in the new location which can put temporary strain on the Mattermost server completing the task.
+
+Another situation which may be confusing involves moving messages to a channel or team where some of the original users are not a member of. The new messages will look like they were posted by these users in the new location, but the users themselves will still not be added as members of the new location. To summarize, Wrangler checks many aspects of the messages being moved, but it doesn't review memberships for each user of each message before taking action.
+
+---
+
+Q: Is there a way to undo the message action I just took?
+
+A: No. If you moved a thread then moving it back should be simple enough, but there is no way to directly undo the actions that Wrangler takes.
+
+---
+
 Q: What does it mean for a plugin to be community supported?
 
 A: Wrangler is one of many plugins that is available to be deployed to a Mattermost instance, but is not directly maintained by Mattermost. Instead, community contributions are accepted for fixes and new features.
