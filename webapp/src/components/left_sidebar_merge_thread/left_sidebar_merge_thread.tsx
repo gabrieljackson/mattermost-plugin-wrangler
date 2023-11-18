@@ -11,7 +11,7 @@ interface Props {
 
 type State = {}
 
-export default class LeftMergeThreadMessage extends React.PureComponent<Props, State> {
+export default class LeftSidebarMergeThreadMessage extends React.PureComponent<Props, State> {
     private exit = async (event: React.MouseEvent) => {
         if (event && event.preventDefault) {
             event.preventDefault();
@@ -34,7 +34,7 @@ export default class LeftMergeThreadMessage extends React.PureComponent<Props, S
             <p>{'It looks like you are merging a thread.'}</p>
             <p>{'Use the post dropdown on the thread you want to merge into or click the "X" right here to quit.'}</p>
             <hr/>
-            <p>{name + '\'s message in ' + mergeThreadPost.channel.display_name + ':'}</p>
+            <p>{'A thread started by ' + name + ' in ' + mergeThreadPost.channel.display_name + ':'}</p>
             <p>{'"' + trimmed + '"'}</p>
         </div>);
 

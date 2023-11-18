@@ -6,7 +6,7 @@ import {GlobalState} from 'mattermost-redux/types/store';
 import {finishMergingThread} from '../../actions';
 import {getMergeThreadPost} from '../../selectors';
 
-import LeftMergeThreadMessage from './left_sidebar_merge_thread';
+import LeftSidebarMergeThreadMessage from './left_sidebar_merge_thread';
 
 function mapStateToProps(state: GlobalState) {
     return {
@@ -20,4 +20,4 @@ function mapDispatchToProps(dispatch: Dispatch<Action>) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LeftMergeThreadMessage);
+export default connect(mapStateToProps, mapDispatchToProps)(LeftSidebarMergeThreadMessage);

@@ -25,18 +25,22 @@ const setupUILater = (registry: PluginRegistry, store: Store<object, Action<obje
 
     if (settings.data.enable_web_ui) {
         registry.registerRootComponent(MoveThreadModal);
-        registry.registerLeftSidebarHeaderComponent(LeftSidebarAttachMessage);
         registry.registerLeftSidebarHeaderComponent(LeftSidebarCopyToChannel);
         registry.registerPostDropdownMenuComponent(MoveThreadDropdown);
-        registry.registerPostDropdownMenuComponent(AttachMessageDropdown);
         registry.registerPostDropdownMenuComponent(CopyToChannelDropdown);
         registry.registerChannelHeaderMenuAction(
             'Copy Messages to Channel',
             (channelId: string) => store.dispatch(startCopyToChannel(getChannel(store.getState(), channelId))),
         );
+
+        // Merging threads has the same functionality as attaching messages, so
+        // only present one option to users.
         if (settings.data.enable_merge_thread) {
             registry.registerLeftSidebarHeaderComponent(LeftSidebarMergeThread);
             registry.registerPostDropdownMenuComponent(MergeThreadDropdown);
+        } else {
+            registry.registerLeftSidebarHeaderComponent(LeftSidebarAttachMessage);
+            registry.registerPostDropdownMenuComponent(AttachMessageDropdown);
         }
     }
 };

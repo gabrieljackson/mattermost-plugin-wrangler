@@ -18,9 +18,15 @@ interface Props {
 }
 
 function mapStateToProps(state: GlobalState, props: Props) {
-    const post = getPost(state, props.postId);
+    let post = getPost(state, props.postId);
     const oldSystemMessageOrNull = post ? isSystemMessage(post) : true;
     const systemMessage = isCombinedUserActivityPost(post) || oldSystemMessageOrNull;
+
+    if (post) {
+        if (post.root_id !== '') {
+            post = getPost(state, post.root_id);
+        }
+    }
 
     let user = null;
     let channel = null;
@@ -29,19 +35,11 @@ function mapStateToProps(state: GlobalState, props: Props) {
         channel = getChannel(state, post.channel_id);
     }
 
-    let validMerge = false;
-    if (post) {
-        if (state.entities.posts.postsInThread[post.id] && post.root_id === '') {
-            validMerge = true;
-        }
-    }
-
     return {
         post,
         user,
         channel,
         isSystemMessage: systemMessage,
-        isValidMergeMessage: validMerge,
         mergeThreadPost: getMergeThreadPost(state),
     };
 }

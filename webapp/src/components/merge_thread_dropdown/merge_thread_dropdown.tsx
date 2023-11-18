@@ -15,7 +15,6 @@ interface Props {
     channel: Channel
     mergeThreadPost: RichPost;
     isSystemMessage: boolean;
-    isValidMergeMessage: boolean;
     startMergingThread: Function;
     finishMergingThread: Function;
     mergeThread: Function;
@@ -49,11 +48,11 @@ export default class MergeThreadDropdown extends React.PureComponent<Props, Stat
         if (this.props.isSystemMessage) {
             return null;
         }
-        if (!this.props.isValidMergeMessage && !this.props.mergeThreadPost) {
-            return null;
-        }
         if (this.props.mergeThreadPost) {
             if (this.props.post.id === this.props.mergeThreadPost.post.id) {
+                return null;
+            }
+            if (this.props.post.create_at >= this.props.mergeThreadPost.post.create_at) {
                 return null;
             }
         }
