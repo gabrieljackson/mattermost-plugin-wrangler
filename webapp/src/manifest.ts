@@ -5,7 +5,7 @@ const manifest = JSON.parse(`
     "id": "com.mattermost.wrangler",
     "name": "Wrangler",
     "description": "Manage messages across teams and channels",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "min_server_version": "7.1.0",
     "server": {
         "executables": {
