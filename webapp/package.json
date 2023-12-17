@@ -18,7 +18,6 @@
     "@fortawesome/free-regular-svg-icons": "5.12.1",
     "@fortawesome/free-solid-svg-icons": "5.12.1",
     "@fortawesome/react-fontawesome": "0.2.0",
-    "@babel/cli": "7.10.1",
     "@babel/core": "7.16.7",
     "@babel/plugin-proposal-class-properties": "7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "7.16.7",
@@ -50,24 +49,23 @@
     "eslint-plugin-react": "7.24.0",
     "file-loader": "6.2.0",
     "css-loader": "6.5.1",
-    "sass-loader": "12.4.0",
+    "sass-loader": "13.3.2",
     "style-loader": "3.0.0",
     "identity-obj-proxy": "3.0.0",
     "jest": "27.4.7",
     "jest-canvas-mock": "2.3.1",
     "jest-junit": "13.0.0",
-    "mattermost-webapp": "github:mattermost/mattermost-webapp#6dcac2993000139f19c1b018f7fa6b9266973918",
     "webpack": "5.88.1",
     "webpack-cli": "4.9.1",
-    "react-bootstrap": "1.0.1",
-    "mattermost-redux": "5.33.1"
+    "react-bootstrap": "1.0.1"
   },
   "dependencies": {
     "core-js": "^3.31.1",
     "react": "16.13.1",
     "react-redux": "^8.1.1",
     "redux": "4.2.1",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "mattermost-redux": "5.33.1"
   },
   "jest": {
     "testPathIgnorePatterns": [
@@ -86,11 +84,7 @@
       "^.+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "identity-obj-proxy",
       "^.+\\.(css|less|scss)$": "identity-obj-proxy",
       "^.*i18n.*\\.(json)$": "<rootDir>/tests/i18n_mock.json",
-      "^bundle-loader\\?lazy\\!(.*)$": "$1",
-      "^mattermost-redux(.*)$": "<rootDir>/node_modules/mattermost-webapp/packages/mattermost-redux/src$1",
-      "^@mattermost/(types)/(.*)$": "<rootDir>/node_modules/mattermost-webapp/packages/$1/src/$2",
-      "^@mattermost/(client)$": "<rootDir>/node_modules/mattermost-webapp/packages/$1/src",
-      "^@mattermost/(components)$": "<rootDir>/node_modules/mattermost-webapp/packages/$1/src"
+      "^bundle-loader\\?lazy\\!(.*)$": "$1"
     },
     "moduleDirectories": [
       "<rootDir>",

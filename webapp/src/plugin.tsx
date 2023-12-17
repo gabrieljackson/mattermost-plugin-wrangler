@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {Action, Store} from 'redux';
-import {PluginRegistry} from 'mattermost-webapp/plugins/registry';
 
 import {getChannel} from 'mattermost-redux/selectors/entities/channels';
 
@@ -18,7 +17,7 @@ import LeftSidebarAttachMessage from './components/left_sidebar_attach_message';
 import LeftSidebarCopyToChannel from './components/left_sidebar_copy_to_channel';
 import LeftSidebarMergeThread from './components/left_sidebar_merge_thread';
 
-const setupUILater = (registry: PluginRegistry, store: Store<object, Action<object>>): () => Promise<void> => async () => {
+const setupUILater = (registry: any, store: Store<object, Action<object>>): () => Promise<void> => async () => {
     registry.registerReducer(reducer);
 
     const settings = await store.dispatch(getSettings());
@@ -53,7 +52,7 @@ export default class Plugin {
         this.haveSetupUI = true;
     };
 
-    public async initialize(registry: PluginRegistry, store: Store<object, Action<object>>) {
+    public async initialize(registry: any, store: Store<object, Action<object>>) {
         this.setupUI = setupUILater(registry, store);
         this.haveSetupUI = false;
 
