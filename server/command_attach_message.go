@@ -115,7 +115,7 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	postToBeAttached.RootId = newRootID
 	postToBeAttached.ParentId = newRootID
 
-	newPost, appErr := p.API.CreatePost(postToBeAttached)
+	newPost, appErr := p.createPostForUser(postToBeAttached)
 	if appErr != nil {
 		return nil, false, errors.Wrap(appErr, "failed to create new post")
 	}

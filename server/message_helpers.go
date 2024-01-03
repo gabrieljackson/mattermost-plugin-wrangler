@@ -8,6 +8,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const wrangerProp = "wrangler"
+
 // validateMoveOrCopy performs validation on a provided post list to determine
 // if all permissions are in place to allow the for the posts to be moved or
 // copied.
@@ -229,7 +231,7 @@ func (p *Plugin) createPostWithRetries(post *model.Post, retryDuration time.Dura
 	var retries int
 
 	for {
-		newPost, appErr := p.API.CreatePost(post)
+		newPost, appErr := p.createPostForUser(post)
 		if appErr == nil {
 			return newPost, nil
 		}
@@ -242,6 +244,11 @@ func (p *Plugin) createPostWithRetries(post *model.Post, retryDuration time.Dura
 
 		time.Sleep(retryDuration)
 	}
+}
+
+func (p *Plugin) createPostForUser(post *model.Post) (*model.Post, *model.AppError) {
+	post.AddProp(wrangerProp, true)
+	return p.API.CreatePost(post)
 }
 
 func getRootPostFromPostList(postList *model.PostList) *model.Post {
