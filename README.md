@@ -79,8 +79,9 @@ Shows version and commit information for the currently-running plugin build.
 The following plugin configuration is available:
 
  - Permitted Wrangler Users: Choose who is allowed to use the Wrangler plugin.
- - Allowed Email Domain: (Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas.
-   - Example: `domain1.com,domain2.net,domain3.org`
+ - Allowed Email Domain: "(Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas. This also supports full email address matching if you want to limit plugin usage to specific users.
+   - Multiple Domain Example: `domain1.com,domain2.net,domain3.org`
+   - Specific User Email Example: `user1@domain.com,user2@domain.com,user1@otherdomain.com`
  - Enable Wrangler webapp functionality: Enable the work-in-progress Wrangler webapp functionality.
  - Enable Wrangler Command AutoComplete: Control whether command autocomplete is enabled or not. If enabled and Allowed Email Domain is set, then some users will be able to see the Wrangler commands, but will be unable to run them.
  - Max Thread Count Move Size: an optional setting to limit the size of threads that can be moved

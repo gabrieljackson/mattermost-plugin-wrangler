@@ -255,6 +255,20 @@ func TestCommand(t *testing.T) {
 				assert.Equal(t, "Permission denied. Please talk to your system administrator to get access.", resp.Text)
 			})
 
+			t.Run("enabled, user email domain partial match", func(t *testing.T) {
+				plugin.setConfiguration(&configuration{
+					PermittedWranglerUsers: permittedUserSystemAdminsAndEmail,
+					AllowedEmailDomain:     "domain.com",
+				})
+				args := &model.CommandArgs{
+					UserId:  user.Id,
+					Command: "wrangler info",
+				}
+				resp, appErr := plugin.ExecuteCommand(context, args)
+				require.Nil(t, appErr)
+				assert.Equal(t, "Permission denied. Please talk to your system administrator to get access.", resp.Text)
+			})
+
 			t.Run("email domain setting is empty", func(t *testing.T) {
 				plugin.setConfiguration(&configuration{
 					PermittedWranglerUsers: permittedUserSystemAdminsAndEmail,
@@ -339,6 +353,21 @@ func TestCommand(t *testing.T) {
 					require.NoError(t, err)
 					assert.False(t, userError)
 					assert.Equal(t, infoResp, resp)
+				})
+
+				t.Run("user has email address that has suffix of a full allowed email", func(t *testing.T) {
+					user.Email = "1user1@test.com"
+					plugin.setConfiguration(&configuration{
+						PermittedWranglerUsers: permittedUserSystemAdminsAndEmail,
+						AllowedEmailDomain:     "emaildomain.com,anotherdomain.com,user1@test.com",
+					})
+					args := &model.CommandArgs{
+						UserId:  user.Id,
+						Command: "wrangler info",
+					}
+					resp, appErr := plugin.ExecuteCommand(context, args)
+					require.Nil(t, appErr)
+					assert.Equal(t, "Permission denied. Please talk to your system administrator to get access.", resp.Text)
 				})
 			})
 		})
