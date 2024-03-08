@@ -85,22 +85,22 @@ func TestAttachMessageCommand(t *testing.T) {
 	api.On("GetUser", mock.Anything).Return(executor, nil)
 	api.On("GetConfig", mock.Anything).Return(config)
 	api.On("LogInfo",
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
 	).Return(nil)
 	api.On("LogError",
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
-		mock.AnythingOfTypeArgument("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("string"),
 	).Return(nil)
 
 	var plugin Plugin
