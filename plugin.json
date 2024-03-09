@@ -41,7 +41,7 @@
                 "key": "AllowedEmailDomain",
                 "display_name": "Allowed Email Domain",
                 "type": "text",
-                "help_text": "(Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas."
+                "help_text": "(Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas. This also supports full email address matching if you want to limit plugin usage to specific users."
             },
             {
                 "key": "EnableWebUI",
