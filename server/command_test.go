@@ -28,7 +28,7 @@ func TestCommand(t *testing.T) {
 	api.On("GetUser", adminUser.Id).Return(adminUser, nil)
 	api.On("GetUser", user.Id).Return(user, nil)
 	api.On("GetUser", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil, &model.AppError{DetailedError: "invalid user"})
-	api.On("LogWarn", mock.AnythingOfTypeArgument("string")).Return(nil)
+	api.On("LogWarn", mock.AnythingOfType("string")).Return(nil)
 
 	var plugin Plugin
 	plugin.SetAPI(api)
