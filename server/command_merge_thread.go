@@ -26,8 +26,8 @@ func (p *Plugin) runMergeThreadCommand(args []string, extra *model.CommandArgs) 
 	if len(args) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getMergeThreadMessage()), true, nil
 	}
-	originalPostID := cleanInputId(args[0])
-	mergeToPostID := cleanInputId(args[1])
+	originalPostID := cleanInputID(args[0])
+	mergeToPostID := cleanInputID(args[1])
 
 	postListResponse, appErr := p.API.GetPostThread(originalPostID)
 	if appErr != nil {

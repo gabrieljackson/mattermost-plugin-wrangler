@@ -111,7 +111,7 @@ func isInputMessageLink(input string) bool {
 	return match
 }
 
-func getMessageIdFromLink(inputLink string) string {
+func getMessageIDFromLink(inputLink string) string {
 	regex := regexp.MustCompile(`(http|https)://[a-zA-Z0-9\-_]+(:\d+)?/([a-zA-Z0-9\-_]+)/pl/([a-zA-Z0-9]{26})`)
 	matches := regex.FindStringSubmatch(inputLink)
 	if len(matches) >= 5 {
@@ -120,9 +120,9 @@ func getMessageIdFromLink(inputLink string) string {
 	return ""
 }
 
-func cleanInputId(input string) string {
+func cleanInputID(input string) string {
 	if isInputMessageLink(input) {
-		return getMessageIdFromLink(input)
+		return getMessageIDFromLink(input)
 	}
 	return input
 }

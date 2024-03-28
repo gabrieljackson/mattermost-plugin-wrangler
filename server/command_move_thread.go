@@ -57,7 +57,7 @@ func (p *Plugin) runMoveThreadCommand(args []string, extra *model.CommandArgs) (
 	if err != nil {
 		return nil, false, err
 	}
-	postID := cleanInputId(args[0])
+	postID := cleanInputID(args[0])
 	channelID := args[1]
 
 	postListResponse, appErr := p.API.GetPostThread(postID)
