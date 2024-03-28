@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
 )
@@ -22,8 +21,8 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 	if len(args) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getAttachMessageCommand()), true, nil
 	}
-	postToBeAttachedID := args[0]
-	postToAttachToID := args[1]
+	postToBeAttachedID := cleanInputId(args[0])
+	postToAttachToID := cleanInputId(args[1])
 
 	if postToBeAttachedID == postToAttachToID {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, "Error: the two provided message IDs should not be the same"), true, nil
@@ -31,6 +30,7 @@ func (p *Plugin) runAttachMessageCommand(args []string, extra *model.CommandArgs
 
 	postToBeAttached, appErr := p.API.GetPost(postToBeAttachedID)
 	if appErr != nil {
+
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: unable to get message with ID %s; ensure this is correct", postToBeAttachedID)), true, nil
 	}
 	postToAttachTo, appErr := p.API.GetPost(postToAttachToID)
