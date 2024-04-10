@@ -18,6 +18,10 @@ func (p *Plugin) validateMoveOrCopy(wpl *WranglerPostList, originalChannel *mode
 		return nil, false, errors.New("The wrangler post list contains no posts")
 	}
 
+	if !p.API.HasPermissionToChannel(extra.UserId, targetChannel.Id, model.PERMISSION_CREATE_POST) {
+		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, fmt.Sprintf("Error: you don't have permissions to create posts in channel %s", targetChannel.Name)), true, nil
+	}
+
 	config := p.getConfiguration()
 
 	switch originalChannel.Type {
