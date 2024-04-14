@@ -41,6 +41,12 @@ func TestMoveThreadCommand(t *testing.T) {
 		Name:   "group-channel",
 		Type:   model.CHANNEL_GROUP,
 	}
+	readOnlyChannel := &model.Channel{
+		Id:     model.NewId(),
+		TeamId: team1.Id,
+		Name:   "read-only",
+		Type:   model.CHANNEL_OPEN,
+	}
 
 	targetTeam := &model.Team{
 		Id:          model.NewId(),
@@ -79,12 +85,15 @@ func TestMoveThreadCommand(t *testing.T) {
 	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
 	api.On("GetChannel", directChannel.Id).Return(directChannel, nil)
 	api.On("GetChannel", groupChannel.Id).Return(groupChannel, nil)
+	api.On("GetChannel", readOnlyChannel.Id).Return(readOnlyChannel, nil)
 	api.On("GetChannel", mock.AnythingOfType("string")).Return(targetChannel, nil)
 	api.On("GetPostThread", mock.AnythingOfType("string")).Return(generatedPosts, nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
 	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything).Return(directChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string")).Return(targetTeam, nil)
 	api.On("GetUser", mock.Anything).Return(executor, nil)
+	api.On("HasPermissionToChannel", mock.AnythingOfType("string"), readOnlyChannel.Id, mock.Anything).Return(false)
+	api.On("HasPermissionToChannel", mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.Anything).Return(true)
 	api.On("CreatePost", mock.Anything, mock.Anything).Return(mockGeneratePost(), nil)
 	api.On("DeletePost", mock.AnythingOfType("string")).Return(nil)
 	api.On("GetReactions", mock.AnythingOfType("string")).Return(reactions, nil)
@@ -261,6 +270,13 @@ func TestMoveThreadCommand(t *testing.T) {
 
 	targetCall.Return(nil, nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
+
+	t.Run("no permission to create posts in target channel", func(t *testing.T) {
+		resp, isUserError, err := plugin.runMoveThreadCommand([]string{originalPostID, readOnlyChannel.Id}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		require.NoError(t, err)
+		assert.True(t, isUserError)
+		assert.Contains(t, resp.Text, "Error: you don't have permissions to create posts in channel read-only")
+	})
 
 	t.Run("move thread successfully", func(t *testing.T) {
 		require.NoError(t, plugin.configuration.IsValid())
