@@ -15,7 +15,7 @@ const manifestStr = `
   "id": "com.mattermost.wrangler",
   "name": "Wrangler",
   "description": "Manage messages across teams and channels",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "min_server_version": "7.1.0",
   "server": {
     "executables": {
@@ -60,7 +60,7 @@ const manifestStr = `
         "key": "AllowedEmailDomain",
         "display_name": "Allowed Email Domain",
         "type": "text",
-        "help_text": "(Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas.",
+        "help_text": "(Optional) When set, users must have an email ending in this domain to use Wrangler. Multiple domains can be specified by separating them with commas. This also supports full email address matching if you want to limit plugin usage to specific users.",
         "placeholder": "",
         "default": null
       },
