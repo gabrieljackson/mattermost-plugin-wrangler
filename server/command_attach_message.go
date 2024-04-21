@@ -8,7 +8,7 @@ import (
 
 const attachMessageCommand = `Error: missing arguments
 
-/wrangler attach message [MESSAGE_ID_TO_BE_ATTACHED] [ROOT_MESSAGE_ID]
+/wrangler attach message [MESSAGE_ID_TO_BE_ATTACHED or MESSAGE_LINK_TO_BE_ATTACHED] [ROOT_MESSAGE_ID or ROOT_MESSAGE_LINK]
 	Attach a given message to a thread in the same channel
 	  - Obtain the message IDs by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
 `

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	moveThreadUsage = `/wrangler move thread [MESSAGE_ID] [CHANNEL_ID]
+	moveThreadUsage = `/wrangler move thread [MESSAGE_ID or MESSAGE_LINK] [CHANNEL_ID]
   Move a given message, along with the thread it belongs to, to a given channel
     - This can be on any channel in any team that you have joined
 	- Use the '/wrangler list' commands to get message and channel IDs
