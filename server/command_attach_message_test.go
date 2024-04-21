@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -27,6 +28,16 @@ func TestAttachMessageCommand(t *testing.T) {
 		ChannelId: channel1.Id,
 	}
 	postToAttachTo := &model.Post{
+		Id:        model.NewId(),
+		UserId:    model.NewId(),
+		ChannelId: channel1.Id,
+	}
+	postToBeAttachedByLink := &model.Post{
+		Id:        model.NewId(),
+		UserId:    model.NewId(),
+		ChannelId: channel1.Id,
+	}
+	postToAttachToByLink := &model.Post{
 		Id:        model.NewId(),
 		UserId:    model.NewId(),
 		ChannelId: channel1.Id,
@@ -73,6 +84,8 @@ func TestAttachMessageCommand(t *testing.T) {
 	api := &plugintest.API{}
 	api.On("GetPost", postToBeAttached.Id).Return(postToBeAttached, nil)
 	api.On("GetPost", postToAttachTo.Id).Return(postToAttachTo, nil)
+	api.On("GetPost", postToBeAttachedByLink.Id).Return(postToBeAttachedByLink, nil)
+	api.On("GetPost", postToAttachToByLink.Id).Return(postToAttachToByLink, nil)
 	api.On("GetPost", postInThreadAlready.Id).Return(postInThreadAlready, nil)
 	api.On("GetPost", postInAnotherChannel.Id).Return(postInAnotherChannel, nil)
 	api.On("GetPost", mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return(nil, model.NewAppError("where", model.NewId(), nil, "not found", 0))
@@ -185,6 +198,21 @@ func TestAttachMessageCommand(t *testing.T) {
 		require.NoError(t, plugin.configuration.IsValid())
 
 		resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttached.Id, postToAttachTo.Id}, &model.CommandArgs{ChannelId: channel1.Id})
+		require.NoError(t, err)
+		assert.False(t, isUserError)
+		assert.Contains(t, resp.Text, "Message successfully attached to thread")
+	})
+
+	t.Run("attach posts by their message links successfully", func(t *testing.T) {
+		plugin.setConfiguration(&configuration{MoveThreadToAnotherTeamEnable: true})
+		require.NoError(t, plugin.configuration.IsValid())
+
+		postToBeAttachedLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, postToBeAttachedByLink.Id)
+		postToAttachToLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, postToAttachToByLink.Id)
+		postToBeAttachedID := getMessageIDFromLink(postToBeAttachedLink)
+		postToAttachToID := getMessageIDFromLink(postToAttachToLink)
+
+		resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttachedID, postToAttachToID}, &model.CommandArgs{ChannelId: channel1.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
 		assert.Contains(t, resp.Text, "Message successfully attached to thread")
