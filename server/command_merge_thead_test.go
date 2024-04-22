@@ -259,9 +259,9 @@ func TestMergeThreadCommand(t *testing.T) {
 		originalPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, originalPostID)
 		targetPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, targetByLinkPostID)
 		cleanOriginalPostID := getMessageIDFromLink(originalPostLink)
-		cleanTargetPostId := getMessageIDFromLink(targetPostLink)
+		cleanTargetPostID := getMessageIDFromLink(targetPostLink)
 
-		resp, isUserError, err := plugin.runMergeThreadCommand([]string{cleanOriginalPostID, cleanTargetPostId}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		resp, isUserError, err := plugin.runMergeThreadCommand([]string{cleanOriginalPostID, cleanTargetPostID}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
 		assert.Contains(t, resp.Text, "A thread with 3 message(s) has been merged")
