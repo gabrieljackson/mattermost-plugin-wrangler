@@ -9,7 +9,7 @@ import (
 )
 
 const mergeThreadUsage = `
-/wrangler merge thread [ROOT_MESSAGE_ID] [TARGET_ROOT_MESSAGE_ID]
+/wrangler merge thread [ROOT_MESSAGE_ID or ROOT_MESSAGE_LINK] [TARGET_ROOT_MESSAGE_ID or TARGET_ROOT_MESSAGE_LINK]
   Merge the messages of two threads
     - Message creation timestamps of both threads will be preserved. This could result in merged threads having messages that seem out of order or with different contexts.
 	- Use the '/wrangler list' commands to get message and channel IDs
@@ -26,8 +26,8 @@ func (p *Plugin) runMergeThreadCommand(args []string, extra *model.CommandArgs) 
 	if len(args) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getMergeThreadMessage()), true, nil
 	}
-	originalPostID := args[0]
-	mergeToPostID := args[1]
+	originalPostID := cleanInputID(args[0])
+	mergeToPostID := cleanInputID(args[1])
 
 	postListResponse, appErr := p.API.GetPostThread(originalPostID)
 	if appErr != nil {

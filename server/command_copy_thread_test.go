@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -76,6 +77,9 @@ func TestCopyThreadCommand(t *testing.T) {
 	generatedPosts := mockGeneratePostList(3, originalChannel.Id, false)
 	originalPostID := generatedPosts.ToSlice()[0].Id
 
+	generatedPostsByLink := mockGeneratePostList(3, originalChannel.Id, false)
+	originalPostByLinkID := generatedPostsByLink.ToSlice()[0].Id
+
 	api := &plugintest.API{}
 	api.On("GetChannel", originalChannel.Id).Return(originalChannel, nil)
 	api.On("GetChannel", privateChannel.Id).Return(privateChannel, nil)
@@ -84,6 +88,7 @@ func TestCopyThreadCommand(t *testing.T) {
 	api.On("GetChannel", readOnlyChannel.Id).Return(readOnlyChannel, nil)
 	api.On("GetChannel", mock.AnythingOfType("string")).Return(targetChannel, nil)
 	api.On("GetPostThread", mock.AnythingOfType("string")).Return(generatedPosts, nil)
+	api.On("GetPostThread", mock.AnythingOfType("string")).Return(generatedPostsByLink, nil)
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
 	api.On("GetDirectChannel", mock.AnythingOfType("string"), mock.Anything).Return(directChannel, nil)
 	api.On("GetTeam", mock.AnythingOfType("string")).Return(targetTeam, nil)
@@ -226,6 +231,19 @@ func TestCopyThreadCommand(t *testing.T) {
 		require.NoError(t, plugin.configuration.IsValid())
 
 		resp, isUserError, err := plugin.runCopyThreadCommand([]string{"id1", "id2"}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		require.NoError(t, err)
+		assert.False(t, isUserError)
+		assert.Contains(t, resp.Text, "Thread copy complete")
+	})
+
+	t.Run("copy thread by link successfully", func(t *testing.T) {
+		require.NoError(t, plugin.configuration.IsValid())
+
+		// Create dummy-links and generate post IDs from them.
+		originalPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, originalPostByLinkID)
+		cleanOriginalPostID := getMessageIDFromLink(originalPostLink)
+
+		resp, isUserError, err := plugin.runCopyThreadCommand([]string{cleanOriginalPostID, targetChannel.Id}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)
 		assert.False(t, isUserError)
 		assert.Contains(t, resp.Text, "Thread copy complete")

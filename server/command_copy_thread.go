@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const copyThreadUsage = `/wrangler copy thread [MESSAGE_ID] [CHANNEL_ID]
+const copyThreadUsage = `/wrangler copy thread [MESSAGE_ID or MESSAGE_LINK] [CHANNEL_ID]
   Copy a given message, along with the thread it belongs to, to a given channel
     - This can be on any channel in any team that you have joined
     - Obtain the message ID by running '/wrangler list messages' or via the 'Permalink' message dropdown option (it's the last part of the URL)
@@ -21,7 +21,7 @@ func (p *Plugin) runCopyThreadCommand(args []string, extra *model.CommandArgs) (
 	if len(args) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getCopyThreadMessage()), true, nil
 	}
-	postID := args[0]
+	postID := cleanInputID(args[0])
 	channelID := args[1]
 
 	postListResponse, appErr := p.API.GetPostThread(postID)

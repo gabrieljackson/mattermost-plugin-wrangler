@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -73,6 +74,7 @@ func TestMergeThreadCommand(t *testing.T) {
 	generatedDirectPosts := mockGeneratePostList(3, directChannel.Id, false)
 	generatedGroupPosts := mockGeneratePostList(3, groupChannel.Id, false)
 	oldGeneratedPosts := mockGeneratePostList(3, targetChannel.Id, false)
+	generatedTargetByLinkPosts := mockGeneratePostList(3, targetChannel.Id, false)
 	for k := range oldGeneratedPosts.Posts {
 		oldGeneratedPosts.Posts[k].CreateAt = 10
 	}
@@ -83,6 +85,7 @@ func TestMergeThreadCommand(t *testing.T) {
 	directPostID := generatedDirectPosts.ToSlice()[0].Id
 	groupPostID := generatedGroupPosts.ToSlice()[0].Id
 	oldPostID := oldGeneratedPosts.ToSlice()[0].Id
+	targetByLinkPostID := generatedTargetByLinkPosts.ToSlice()[0].Id
 
 	api := &plugintest.API{}
 
@@ -92,6 +95,7 @@ func TestMergeThreadCommand(t *testing.T) {
 	api.On("GetChannel", groupChannel.Id).Return(groupChannel, nil)
 	api.On("GetChannel", targetChannel.Id).Return(targetChannel, nil)
 	api.On("GetChannel", oldPostID).Return(targetChannel, nil)
+	api.On("GetChannel", targetByLinkPostID).Return(targetChannel, nil)
 
 	api.On("GetPostThread", originalPostID).Return(generatedOriginalPosts, nil)
 	api.On("GetPostThread", privatePostID).Return(generatedPrivatePosts, nil)
@@ -99,6 +103,7 @@ func TestMergeThreadCommand(t *testing.T) {
 	api.On("GetPostThread", groupPostID).Return(generatedGroupPosts, nil)
 	api.On("GetPostThread", targetPostID).Return(generatedTargetPosts, nil)
 	api.On("GetPostThread", oldPostID).Return(oldGeneratedPosts, nil)
+	api.On("GetPostThread", targetByLinkPostID).Return(generatedTargetByLinkPosts, nil)
 
 	api.On("GetChannelMember", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(mockGenerateChannelMember(), nil)
 	api.On("GetTeam", mock.AnythingOfType("string")).Return(targetTeam, nil)
@@ -243,5 +248,23 @@ func TestMergeThreadCommand(t *testing.T) {
 		require.NoError(t, err)
 		assert.True(t, isUserError)
 		assert.Contains(t, resp.Text, "Error: the thread is 3 posts long, but this command is configured to only move threads of up to 1 posts")
+	})
+
+	t.Run("merge thread by link sucessfully", func(t *testing.T) {
+		// Reset the configuration from the previous test.
+		plugin.configuration.MoveThreadMaxCount = "3"
+		require.NoError(t, plugin.configuration.IsValid())
+
+		// Create dummy-links and generate post IDs from them.
+		originalPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, originalPostID)
+		targetPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, targetByLinkPostID)
+		cleanOriginalPostID := getMessageIDFromLink(originalPostLink)
+		cleanTargetPostID := getMessageIDFromLink(targetPostLink)
+
+		resp, isUserError, err := plugin.runMergeThreadCommand([]string{cleanOriginalPostID, cleanTargetPostID}, &model.CommandArgs{ChannelId: originalChannel.Id})
+		require.NoError(t, err)
+		assert.False(t, isUserError)
+		assert.Contains(t, resp.Text, "A thread with 3 message(s) has been merged")
+
 	})
 }

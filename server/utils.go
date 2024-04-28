@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -104,3 +105,24 @@ func NewInt64(n int64) *int64 { return &n }
 
 // NewString returns a pointer to a given string.
 func NewString(s string) *string { return &s }
+
+func isInputMessageLink(input string) bool {
+	match, _ := regexp.MatchString("(http|https)://[a-zA-Z0-9\\-_.]+(:\\d+)?/([a-zA-Z0-9\\-_]+)/pl/[a-zA-Z0-9]{26}", input)
+	return match
+}
+
+func getMessageIDFromLink(inputLink string) string {
+	regex := regexp.MustCompile(`(http|https)://[a-zA-Z0-9\-_.]+(:\d+)?/([a-zA-Z0-9\-_]+)/pl/([a-zA-Z0-9]{26})`)
+	matches := regex.FindStringSubmatch(inputLink)
+	if len(matches) >= 5 {
+		return matches[4]
+	}
+	return ""
+}
+
+func cleanInputID(input string) string {
+	if isInputMessageLink(input) {
+		return getMessageIDFromLink(input)
+	}
+	return input
+}
