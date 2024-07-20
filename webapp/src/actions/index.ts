@@ -1,6 +1,9 @@
 import {GlobalState} from 'mattermost-redux/types/store';
 
 import {Channel} from 'mattermost-redux/types/channels';
+import {Team} from 'mattermost-redux/types/teams';
+import {getTeam, getTeamMemberships} from 'mattermost-redux/selectors/entities/teams';
+import {Client4} from 'mattermost-redux/client';
 
 import {RECEIVED_PLUGIN_SETTINGS} from '../types/wrangler';
 import {OPEN_MOVE_THREAD_MODAL, CLOSE_MOVE_THREAD_MODAL} from '../types/ui';
@@ -121,6 +124,35 @@ export function getSettings(): ActionFunc {
         });
 
         return {data: settings};
+    };
+}
+
+export function getMyTeams(): Function {
+    return async (_: DispatchFunc, getState: GetStateFunc) => {
+        const myTeamMemberships = getTeamMemberships(getState());
+        const myTeams = Array<Team>();
+        Object.keys(myTeamMemberships).forEach((id) => {
+            const team = getTeam(getState(), id);
+            myTeams.push(team);
+        });
+
+        return myTeams;
+    };
+}
+
+export function getChannelsForTeam(teamID: string): Function {
+    return async () => {
+        let allMyChannelsInTeam = Array<Channel>();
+        allMyChannelsInTeam = await Client4.getMyChannels(teamID);
+
+        const myOpenAndPrivateChannelsInTeam = Array<Channel>();
+        allMyChannelsInTeam.forEach((channel) => {
+            if (channel.type === 'O' || channel.type === 'P') {
+                myOpenAndPrivateChannelsInTeam.push(channel);
+            }
+        });
+
+        return myOpenAndPrivateChannelsInTeam;
     };
 }
 

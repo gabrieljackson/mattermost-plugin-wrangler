@@ -60,7 +60,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
     }
 
     private loadTeams = async () => {
-        const myTeams = this.props.getMyTeams();
+        const myTeams = await this.props.getMyTeams();
 
         let firstTeamID = '';
         let firstChannelID = '';
