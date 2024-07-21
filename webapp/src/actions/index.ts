@@ -133,7 +133,15 @@ export function getMyTeams(): Function {
         const myTeams = Array<Team>();
         Object.keys(myTeamMemberships).forEach((id) => {
             const team = getTeam(getState(), id);
-            myTeams.push(team);
+
+            // There are cases where a team may not be loaded into redux even
+            // though they exist. This seems most likely to occur when many
+            // teams exist on the Mattermost instance. This will protect against
+            // crashes, but looking up missing teams will require further
+            // investigation.
+            if (typeof team !== 'undefined') {
+                myTeams.push(team);
+            }
         });
 
         return myTeams;
