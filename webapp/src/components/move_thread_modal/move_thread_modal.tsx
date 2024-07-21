@@ -30,6 +30,7 @@ type State = {
     actionWord: string,
     moveShowRootMessage: boolean,
     moveSilent: boolean,
+    processing: boolean,
 }
 
 export default class MoveThreadModal extends React.PureComponent<Props, State> {
@@ -46,6 +47,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             actionWord: 'Move',
             moveShowRootMessage: true,
             moveSilent: false,
+            processing: false,
         };
     }
 
@@ -108,12 +110,14 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
             event.preventDefault();
         }
 
+        this.setState({processing: true});
         if (this.state.actionType === MessageActionTypeMove) {
             await this.props.moveThread(this.props.postID, this.state.selectedChannel, this.state.moveShowRootMessage, this.state.moveSilent);
         } else {
             await this.props.copyThread(this.props.postID, this.state.selectedChannel);
         }
         this.props.closeMoveThreadModal();
+        this.setState({processing: false});
     };
 
     private handleClose = async (event: React.MouseEvent) => {
@@ -145,7 +149,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        let disabled = false;
+        let disabled = this.state.processing;
         if (this.props.postID === '' || this.state.selectedChannel === '') {
             disabled = true;
         }
@@ -156,6 +160,11 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
         if (this.props.threadCount > 1) {
             title = 'Wrangler - ' + actionWord + ' Thread to Another Channel';
             moveMessage = actionWord + ' this thread of ' + this.props.threadCount + ' messages?';
+        }
+
+        let actionButtonText = this.state.moveThreadButtonText;
+        if (this.state.processing) {
+            actionButtonText = (actionWord === 'Move') ? 'Moving...' : 'Copying...';
         }
 
         let moveCheckboxes = null;
@@ -295,13 +304,13 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                     <button
                         id='saveSetting'
                         className='btn btn-primary'
-                        style={{width: '115px'}}
+                        style={{width: '130px'}}
                         onClick={this.handleOnClick}
                         onMouseEnter={this.handleButtonOnMouseEnter.bind(this)}
                         onMouseLeave={this.handleButtonOnMouseLeave.bind(this)}
                         disabled={disabled}
                     >
-                        {this.state.moveThreadButtonText}
+                        {actionButtonText}
                     </button>
                 </Modal.Footer>
             </Modal>
