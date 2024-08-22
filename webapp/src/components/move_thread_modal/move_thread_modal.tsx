@@ -8,6 +8,8 @@ import {Channel} from 'mattermost-redux/types/channels';
 
 import {MessageActionType, MessageActionTypeMove, MessageActionTypeCopy} from '../../types/actions';
 
+import '../style.scss';
+
 interface Props {
     visible: boolean;
     postID: string;
@@ -176,6 +178,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                             <input
                                 type='checkbox'
                                 id='showRootMessageOption'
+                                className='styled-accent'
                                 checked={this.state.moveShowRootMessage}
                                 onChange={() => this.setState({moveShowRootMessage: !this.state.moveShowRootMessage})}
                             />
@@ -187,6 +190,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                             <input
                                 type='checkbox'
                                 id='showSilenceOption'
+                                className='styled-accent'
                                 checked={this.state.moveSilent}
                                 onChange={() => this.setState({moveSilent: !this.state.moveSilent})}
                             />
@@ -222,6 +226,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                                         <input
                                             id={MessageActionTypeMove}
                                             type='radio'
+                                            className='styled-accent'
                                             checked={this.state.actionType === MessageActionTypeMove}
                                             onChange={() => this.setState({actionType: MessageActionTypeMove, actionWord: 'Move'})}
                                         />
@@ -233,6 +238,7 @@ export default class MoveThreadModal extends React.PureComponent<Props, State> {
                                         <input
                                             id={MessageActionTypeCopy}
                                             type='radio'
+                                            className='styled-accent'
                                             checked={this.state.actionType === MessageActionTypeCopy}
                                             onChange={() => this.setState({actionType: MessageActionTypeCopy, actionWord: 'Copy'})}
                                         />
