@@ -258,8 +258,8 @@ func TestMergeThreadCommand(t *testing.T) {
 		// Create dummy-links and generate post IDs from them.
 		originalPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, originalPostID)
 		targetPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, targetByLinkPostID)
-		cleanOriginalPostID := getMessageIDFromLink(originalPostLink)
-		cleanTargetPostID := getMessageIDFromLink(targetPostLink)
+		cleanOriginalPostID := getMessageIDFromLink(originalPostLink, *config.ServiceSettings.SiteURL)
+		cleanTargetPostID := getMessageIDFromLink(targetPostLink, *config.ServiceSettings.SiteURL)
 
 		resp, isUserError, err := plugin.runMergeThreadCommand([]string{cleanOriginalPostID, cleanTargetPostID}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)

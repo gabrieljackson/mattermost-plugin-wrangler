@@ -21,7 +21,7 @@ func (p *Plugin) runCopyThreadCommand(args []string, extra *model.CommandArgs) (
 	if len(args) < 2 {
 		return getCommandResponse(model.COMMAND_RESPONSE_TYPE_EPHEMERAL, getCopyThreadMessage()), true, nil
 	}
-	postID := cleanInputID(args[0])
+	postID := cleanInputID(args[0], extra.SiteURL)
 	channelID := args[1]
 
 	postListResponse, appErr := p.API.GetPostThread(postID)
