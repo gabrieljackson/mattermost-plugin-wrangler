@@ -87,16 +87,28 @@ func TestCleanInputID(t *testing.T) {
 			expected: "8w89igrsffyt3ghmwsmsgyeoqe",
 		},
 		{
+			name:     "valid link, but for another server",
+			input:    "https://test.sampledomain.com/team2/pl/8w89igrsffyt3ghmwsmsgyeoqe",
+			siteURL:  "https://test2.sampledomain.com",
+			expected: "https://test.sampledomain.com/team2/pl/8w89igrsffyt3ghmwsmsgyeoqe",
+		},
+		{
 			name:     "valid id",
 			input:    "8w89igrsffyt3ghmwsmsgyeoqe",
 			siteURL:  "https://test.sampledomain.com",
 			expected: "8w89igrsffyt3ghmwsmsgyeoqe",
 		},
 		{
-			name:     "invalid link",
+			name:     "invalid link with no path",
 			input:    "https://invalid_link",
 			siteURL:  "https://invalid_link",
 			expected: "https://invalid_link",
+		},
+		{
+			name:     "invalid link with partial path",
+			input:    "https://invalid_linkteam2/pl/",
+			siteURL:  "https://invalid_link",
+			expected: "https://invalid_linkteam2/pl/",
 		},
 		{
 			name:     "invalid link due to short ID",
