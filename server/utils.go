@@ -106,23 +106,26 @@ func NewInt64(n int64) *int64 { return &n }
 // NewString returns a pointer to a given string.
 func NewString(s string) *string { return &s }
 
-func isInputMessageLink(input string) bool {
-	match, _ := regexp.MatchString("(http|https)://[a-zA-Z0-9\\-_.]+(:\\d+)?/([a-zA-Z0-9\\-_]+)/pl/[a-zA-Z0-9]{26}", input)
-	return match
+var pathRegex = regexp.MustCompile(`/([a-zA-Z0-9\-_]+)/pl/([a-zA-Z0-9]{26})?$`)
+
+// getMessageIDFromLink will return the message ID of a properly formatted
+// message link or the original input value if there is no match.
+func getMessageIDFromLink(input, siteURL string) string {
+	if !strings.HasPrefix(input, siteURL) {
+		return input
+	}
+	path := strings.TrimPrefix(input, siteURL)
+	if !pathRegex.MatchString(path) {
+		return input
+	}
+	matches := pathRegex.FindStringSubmatch(path)
+	if len(matches) < 3 {
+		return input
+	}
+
+	return matches[2]
 }
 
-func getMessageIDFromLink(inputLink string) string {
-	regex := regexp.MustCompile(`(http|https)://[a-zA-Z0-9\-_.]+(:\d+)?/([a-zA-Z0-9\-_]+)/pl/([a-zA-Z0-9]{26})`)
-	matches := regex.FindStringSubmatch(inputLink)
-	if len(matches) >= 5 {
-		return matches[4]
-	}
-	return ""
-}
-
-func cleanInputID(input string) string {
-	if isInputMessageLink(input) {
-		return getMessageIDFromLink(input)
-	}
-	return input
+func cleanInputID(input, siteURL string) string {
+	return getMessageIDFromLink(input, siteURL)
 }

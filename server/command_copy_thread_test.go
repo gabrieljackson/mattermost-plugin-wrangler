@@ -241,7 +241,7 @@ func TestCopyThreadCommand(t *testing.T) {
 
 		// Create dummy-links and generate post IDs from them.
 		originalPostLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, originalPostByLinkID)
-		cleanOriginalPostID := getMessageIDFromLink(originalPostLink)
+		cleanOriginalPostID := getMessageIDFromLink(originalPostLink, *config.ServiceSettings.SiteURL)
 
 		resp, isUserError, err := plugin.runCopyThreadCommand([]string{cleanOriginalPostID, targetChannel.Id}, &model.CommandArgs{ChannelId: originalChannel.Id})
 		require.NoError(t, err)

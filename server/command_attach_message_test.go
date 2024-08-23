@@ -77,7 +77,7 @@ func TestAttachMessageCommand(t *testing.T) {
 
 	config := &model.Config{
 		ServiceSettings: model.ServiceSettings{
-			SiteURL: NewString("test.sampledomain.com"),
+			SiteURL: NewString("https://test.sampledomain.com"),
 		},
 	}
 
@@ -207,10 +207,10 @@ func TestAttachMessageCommand(t *testing.T) {
 		plugin.setConfiguration(&configuration{MoveThreadToAnotherTeamEnable: true})
 		require.NoError(t, plugin.configuration.IsValid())
 
-		postToBeAttachedLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, postToBeAttachedByLink.Id)
-		postToAttachToLink := fmt.Sprintf("https://%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, postToAttachToByLink.Id)
-		postToBeAttachedID := getMessageIDFromLink(postToBeAttachedLink)
-		postToAttachToID := getMessageIDFromLink(postToAttachToLink)
+		postToBeAttachedLink := fmt.Sprintf("%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, postToBeAttachedByLink.Id)
+		postToAttachToLink := fmt.Sprintf("%s/%s/pl/%s", *config.ServiceSettings.SiteURL, team1.Name, postToAttachToByLink.Id)
+		postToBeAttachedID := getMessageIDFromLink(postToBeAttachedLink, *config.ServiceSettings.SiteURL)
+		postToAttachToID := getMessageIDFromLink(postToAttachToLink, *config.ServiceSettings.SiteURL)
 
 		resp, isUserError, err := plugin.runAttachMessageCommand([]string{postToBeAttachedID, postToAttachToID}, &model.CommandArgs{ChannelId: channel1.Id})
 		require.NoError(t, err)

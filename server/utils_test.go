@@ -73,85 +73,60 @@ func TestMakeBotDM(t *testing.T) {
 	}
 }
 
-func TestIsInputMessageLink(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected bool
-	}{
-		{
-			name:     "valid link",
-			input:    "https://test.sampledomain.com/team_id/pl/8w89igrsffyt3ghmwsmsgyeoqe",
-			expected: true,
-		},
-		{
-			name:     "invalid link",
-			input:    "https://invalid_link",
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := isInputMessageLink(tt.input)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
-
-func TestGetMessageIDFromLink(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "valid link",
-			input:    "https://test.sampledomain.com/team-1/pl/8w89igrsffyt3ghmwsmsgyeoqe",
-			expected: "8w89igrsffyt3ghmwsmsgyeoqe",
-		},
-		{
-			name:     "invalid link",
-			input:    "https://invalid_link",
-			expected: "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := getMessageIDFromLink(tt.input)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
-
 func TestCleanInputID(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
+		siteURL  string
 		expected string
 	}{
 		{
 			name:     "valid link",
 			input:    "https://test.sampledomain.com/team2/pl/8w89igrsffyt3ghmwsmsgyeoqe",
+			siteURL:  "https://test.sampledomain.com",
 			expected: "8w89igrsffyt3ghmwsmsgyeoqe",
+		},
+		{
+			name:     "valid link, but for another server",
+			input:    "https://test.sampledomain.com/team2/pl/8w89igrsffyt3ghmwsmsgyeoqe",
+			siteURL:  "https://test2.sampledomain.com",
+			expected: "https://test.sampledomain.com/team2/pl/8w89igrsffyt3ghmwsmsgyeoqe",
 		},
 		{
 			name:     "valid id",
 			input:    "8w89igrsffyt3ghmwsmsgyeoqe",
+			siteURL:  "https://test.sampledomain.com",
 			expected: "8w89igrsffyt3ghmwsmsgyeoqe",
 		},
 		{
-			name:     "invalid link",
+			name:     "invalid link with no path",
 			input:    "https://invalid_link",
+			siteURL:  "https://invalid_link",
 			expected: "https://invalid_link",
+		},
+		{
+			name:     "invalid link with partial path",
+			input:    "https://invalid_linkteam2/pl/",
+			siteURL:  "https://invalid_link",
+			expected: "https://invalid_linkteam2/pl/",
+		},
+		{
+			name:     "invalid link due to short ID",
+			input:    "https://test.sampledomain.com/team2/pl/tooshort",
+			siteURL:  "https://test.sampledomain.com",
+			expected: "https://test.sampledomain.com/team2/pl/tooshort",
+		},
+		{
+			name:     "invalid link due to long ID",
+			input:    "https://test.sampledomain.com/team2/pl/toolong8w89igrsffyt3ghmwsmsgyeoqe",
+			siteURL:  "https://test.sampledomain.com",
+			expected: "https://test.sampledomain.com/team2/pl/toolong8w89igrsffyt3ghmwsmsgyeoqe",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := cleanInputID(tt.input)
-			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.expected, cleanInputID(tt.input, tt.siteURL))
 		})
 	}
 }
