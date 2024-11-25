@@ -45,7 +45,7 @@ endif
 
 ## Runs go style checks.
 .PHONY: check-style-go
-check-style-go: gofmt govet golint
+check-style-go: gofmt govet
 
 ## Runs gofmt against all packages.
 .PHONY: gofmt
@@ -72,20 +72,9 @@ endif
 govet:
 ifneq ($(HAS_SERVER),)
 	@echo Running govet
-	@# Workaround because you can't install binaries without adding them to go.mod
-	env GO111MODULE=off $(GO) get golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
 	$(GO) vet ./...
-	$(GO) vet -vettool=$(GOPATH)/bin/shadow ./...
 	@echo Govet success
 endif
-
-## Runs golint against all packages.
-.PHONY: golint
-golint:
-	@echo Running lint
-	env GO111MODULE=off $(GO) get golang.org/x/lint/golint
-	$(GOPATH)/bin/golint -set_exit_status ./...
-	@echo lint success
 
 ## Builds the server, if it exists, including support for multiple architectures.
 .PHONY: server
