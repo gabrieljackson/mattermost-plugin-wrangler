@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -127,6 +128,37 @@ func TestCleanInputID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.expected, cleanInputID(tt.input, tt.siteURL))
+		})
+	}
+}
+
+func TestCleanPost(t *testing.T) {
+	tests := []struct {
+		name     string
+		post     *model.Post
+		expected *model.Post
+	}{
+		{
+			name:     "empty",
+			post:     &model.Post{},
+			expected: &model.Post{},
+		},
+		{
+			name:     "standard clean",
+			post:     &model.Post{Id: "ID1", CreateAt: 1, UpdateAt: 2, EditAt: 3, Message: "test message", Props: model.StringInterface{"testProp": "test"}},
+			expected: &model.Post{Message: "test message", Props: model.StringInterface{"testProp": "test"}},
+		},
+		{
+			name:     "remove ai plugin post prop",
+			post:     &model.Post{Id: "ID1", CreateAt: 1, UpdateAt: 2, EditAt: 3, Message: "test message", Props: model.StringInterface{"testProp": "test", aiPluginPostProp: "true"}},
+			expected: &model.Post{Message: "test message", Props: model.StringInterface{"testProp": "test"}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleanPost(tt.post)
+			assert.Equal(t, tt.expected, tt.post)
 		})
 	}
 }
