@@ -10,6 +10,8 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
+const aiPluginPostProp = "activate_ai"
+
 func makePostLink(siteURL, teamName, postID string) string {
 	return fmt.Sprintf("%s/%s/pl/%s", siteURL, teamName, postID)
 }
@@ -27,6 +29,11 @@ func cleanPost(post *model.Post) {
 	post.CreateAt = 0
 	post.UpdateAt = 0
 	post.EditAt = 0
+
+	// Remove post props of other plugins where unintended behavior may occur.
+	if post.GetProp(aiPluginPostProp) != nil {
+		post.DelProp(aiPluginPostProp)
+	}
 }
 
 func cleanPostID(post *model.Post) {
