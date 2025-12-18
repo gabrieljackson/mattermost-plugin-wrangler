@@ -24,8 +24,8 @@ These functions are designed to quickly bring messages to a place they likely ha
 2. On your Mattermost, go to System Console -> Plugin Management and upload it.
 3. Configure plugin settings as desired.
 4. In order for the plugin to properly recreate messages, ensure the following system console settings are set to true:
-    1. [Enable integrations to override usernames](https://docs.mattermost.com/administration/config-settings.html#enable-integrations-to-override-usernames)
-    2. [Enable integrations to override profile picture icons](https://docs.mattermost.com/administration/config-settings.html#enable-integrations-to-override-profile-picture-icons)
+    1. [Enable integrations to override usernames](https://docs.mattermost.com/administration-guide/configure/integrations-configuration-settings.html#enable-integrations-to-override-usernames), config option `ServiceSettings.EnablePostUsernameOverride`
+    2. [Enable integrations to override profile picture icons](https://docs.mattermost.com/administration-guide/configure/integrations-configuration-settings.html#enable-integrations-to-override-profile-picture-icons), config option `ServiceSettings.EnablePostIconOverride`
 5. Start using the plugin!
 
 ## Questions?
